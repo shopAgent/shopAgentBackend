@@ -1,14 +1,19 @@
 package org.spring.shopagent.config;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.mybatis.spring.SqlSessionFactoryBean;
+import org.spring.shopagent.mapper.ShopMapper;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
+import javax.sql.DataSource;
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.Arrays;
 import java.util.Properties;
 
 @Component
@@ -17,6 +22,7 @@ public class DbAutoInitializer implements ApplicationRunner {
 
     private final ApplicationContext ctx;
     private final DynamicDataSourceConfig dynamicDataSourceConfig;
+    private final DynamicMapperRegistrar dynamicMapperRegistrar;
 
     public static boolean dbConnected = false;
 
@@ -35,9 +41,28 @@ public class DbAutoInitializer implements ApplicationRunner {
             String password = props.getProperty("db.password");
 
             try {
-                dynamicDataSourceConfig.initialize(url, username, password, ctx);
+                DataSource dataSource = dynamicDataSourceConfig.initialize(url, username, password, ctx);
                 dbConnected = true;
                 System.out.println("DB 자동 연결 성공");
+
+                // 2. SqlSessionFactory 생성
+                SqlSessionFactoryBean factoryBean = new SqlSessionFactoryBean();
+                factoryBean.setDataSource(dataSource);
+                factoryBean.setMapperLocations(
+                        new PathMatchingResourcePatternResolver().getResources("classpath:/mapper/**/*.xml"));
+                SqlSessionFactory sqlSessionFactory = factoryBean.getObject();
+                dynamicMapperRegistrar.registerMappers("org.spring.shopagent.mapper", sqlSessionFactory, ctx);
+                String[] beanNames = ctx.getBeanDefinitionNames();
+                System.out.println("등록된 Bean:");
+                Arrays.stream(beanNames)
+                        .filter(name -> name.contains("shop") || name.contains("Mapper"))
+                        .forEach(System.out::println);
+
+
+                System.out.println("Mapper 등록 완료");
+
+                ShopMapper shopMapper = ctx.getBean(ShopMapper.class);
+                System.out.println("select Result: " + shopMapper.selectNow());
             } catch (Exception e) {
                 dbConnected = false;
                 System.err.println("DB 연결 실패: " + e.getMessage());
@@ -49,5 +74,7 @@ public class DbAutoInitializer implements ApplicationRunner {
             System.out.println("DB 설정 파일 없음. 웹 UI에서 설정하세요.");
         }
     }
+
+
 }
 

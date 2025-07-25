@@ -18,7 +18,7 @@ public class DynamicDataSourceConfig {
 
     private SqlSessionFactory sqlSessionFactory;
 
-    public void initialize(String url, String username, String password, ApplicationContext ctx) throws Exception {
+    public DataSource initialize(String url, String username, String password, ApplicationContext ctx) throws Exception {
         HikariConfig config = new HikariConfig();
         config.setJdbcUrl(url);
         config.setUsername(username);
@@ -36,6 +36,8 @@ public class DynamicDataSourceConfig {
         ConfigurableApplicationContext configurableContext = (ConfigurableApplicationContext) ctx;
         configurableContext.getBeanFactory().registerSingleton("dataSource", dataSource);
         configurableContext.getBeanFactory().registerSingleton("sqlSessionFactory", sqlSessionFactory);
+
+        return dataSource;
     }
 
 
