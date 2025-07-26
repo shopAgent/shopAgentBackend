@@ -4,6 +4,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Configuration;
@@ -34,8 +35,19 @@ public class DynamicDataSourceConfig {
         SqlSessionFactory sqlSessionFactory = sessionFactoryBean.getObject();
 
         ConfigurableApplicationContext configurableContext = (ConfigurableApplicationContext) ctx;
-        configurableContext.getBeanFactory().registerSingleton("dataSource", dataSource);
-        configurableContext.getBeanFactory().registerSingleton("sqlSessionFactory", sqlSessionFactory);
+        DefaultListableBeanFactory beanFactory = (DefaultListableBeanFactory) configurableContext.getBeanFactory();
+
+        // 기존 빈 제거
+        if (beanFactory.containsSingleton("dataSource")) {
+            beanFactory.destroySingleton("dataSource");
+        }
+        if (beanFactory.containsSingleton("sqlSessionFactory")) {
+            beanFactory.destroySingleton("sqlSessionFactory");
+        }
+
+        // 새로 등록
+        beanFactory.registerSingleton("dataSource", dataSource);
+        beanFactory.registerSingleton("sqlSessionFactory", sqlSessionFactory);
 
         return dataSource;
     }
