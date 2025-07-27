@@ -11,7 +11,6 @@ public class SettingController {
 
     private final SettingService settingService;
 
-
     @PostMapping("/config/db")
     public ApiResponseDto<Void> setupDatabase(@RequestBody DbConfigRequestDTO dto) {
         return settingService.setupDatabase(dto);

@@ -5,6 +5,7 @@ import org.spring.shopagent.common.DynamicDatabaseService;
 import org.spring.shopagent.config.DbAutoInitializer;
 import org.spring.shopagent.exception.CustomException;
 import org.spring.shopagent.exception.ErrorType;
+import org.spring.shopagent.h2mapper.H2Mapper;
 import org.spring.shopagent.mapper.ShopMapper;
 import org.spring.shopagent.mapper.provider.ShopMapperProvider;
 import org.spring.shopagent.response.ApiResponseDto;
@@ -26,6 +27,8 @@ public class SettingService {
     private final DynamicDatabaseService dynamicDatabaseService;
 
     private final ShopMapperProvider shopMapperProvider;
+
+    private final H2Mapper h2Mapper;
 
     public ApiResponseDto<Void> setupDatabase(@RequestBody DbConfigRequestDTO dto) {
         try {
@@ -61,6 +64,8 @@ public class SettingService {
         ShopMapper shopMapper = shopMapperProvider.get();
 
         System.out.println(shopMapper.selectNow());
+        System.out.println("====================");
+        System.out.println(h2Mapper.selectNow());
 
         if (DbAutoInitializer.dbConnected) {
             return ResponseUtils.ok(MsgType.DB_CONNECTION_SUCCESS);

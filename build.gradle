@@ -32,7 +32,7 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     implementation 'com.zaxxer:HikariCP:5.1.0'
-    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.3.1'
+    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
     implementation 'mysql:mysql-connector-java:8.0.33'
     implementation 'org.reflections:reflections:0.10.2'
 
