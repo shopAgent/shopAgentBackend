@@ -9,4 +9,15 @@
         SELECT NOW()
     </select>
 
+    <update id="updateDatabaseName" parameterType="map">
+        UPDATE TABLE_INFO SET database_name = #{databaseName}
+    </update>
+
+    <select id="selectDatabaseInfo" resultType="org.spring.shopagent.info.dto.DatabaseInfoResponseDTO">
+        SELECT
+            DATABASE_NAME AS databaseName,
+            TABLE_NAME AS tableName,
+            COLUMN_NAME AS columnName
+        FROM TABLE_INFO
+    </select>
 </mapper>

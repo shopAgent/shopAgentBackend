@@ -9,4 +9,16 @@
         SELECT NOW()
     </select>
 
+    <select id="selectDatabaseList" parameterType="map" resultType="String">
+        SELECT schema_name
+        FROM information_schema.schemata
+        WHERE schema_name NOT IN ('mysql', 'information_schema', 'performance_schema', 'sys');
+    </select>
+
+    <select id="selectDatabaseCheck" parameterType="map" resultType="String">
+        SELECT schema_name
+        FROM information_schema.schemata
+        WHERE schema_name = #{databaseName};
+    </select>
+
 </mapper>

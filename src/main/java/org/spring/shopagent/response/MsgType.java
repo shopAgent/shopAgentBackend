@@ -5,8 +5,8 @@ import lombok.Getter;
 @Getter
 public enum MsgType {
 
-    DB_CONNECTION_SUCCESS("DB 연결 성공"),
-    DB_CONFIG_UPDATE_SUCCESS("DB 설정 업데이트 성공"),
+    DB_CONNECTION_SUCCESS("DB Connection Success"),
+    DB_CONFIG_UPDATE_SUCCESS("DB Config Update Success"),
     ;
 
     private final String msg;

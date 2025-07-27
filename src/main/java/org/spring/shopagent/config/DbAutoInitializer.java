@@ -50,6 +50,11 @@ public class DbAutoInitializer implements ApplicationRunner {
         dbConnected = dynamicDatabaseService.initializeDatabase(url, username, password, true);
     }
 
+    public static void isDbConnectedThrow() {
+        if (!dbConnected)
+            throw new RuntimeException("DB 연결이 실패했습니다. 설정을 확인하세요.");
+    }
+
 
 }
 
