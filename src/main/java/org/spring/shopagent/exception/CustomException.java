@@ -1,15 +1,27 @@
 package org.spring.shopagent.exception;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 @Getter
-@RequiredArgsConstructor
-public class CustomException extends RuntimeException{
+public class CustomException extends RuntimeException {
+
     private final ErrorType errorType;
+    private final String customMessage;
+
+    public CustomException(ErrorType errorType) {
+        super(errorType.getMsg());
+        this.errorType = errorType;
+        this.customMessage = null;
+    }
+
+    public CustomException(ErrorType errorType, String customMessage) {
+        super(errorType.getMsg() + " - " + customMessage);
+        this.errorType = errorType;
+        this.customMessage = customMessage;
+    }
 
     @Override
     public String getMessage() {
-        return errorType.getMsg();
+        return customMessage == null ? errorType.getMsg() : errorType.getMsg() + " - " + customMessage;
     }
 }

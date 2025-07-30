@@ -7,14 +7,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 @Data
-public class DbConfigRequestDTO {
-
-    @NotEmpty(message = "AI provider cannot be empty")
-    @Pattern(regexp = "Gemini|OpenAI|Claude", message = "AI provider must be one of: Gemini, OpenAI, Claude")
-    private String aiProvider;
-
-    @NotEmpty(message = "Token cannot be empty")
-    private String token;
+public class DbConnectionTestRequestDTO {
 
     @NotEmpty(message = "Database type cannot be empty")
     @Pattern(regexp = "MySQL|MSSQL|PostgreSQL|SQLite", message = "Database type must be one of: MySQL, MsSQL, PostgreSQL, SQLite")
@@ -35,11 +28,5 @@ public class DbConfigRequestDTO {
     @NotNull(message = "Database port cannot be null")
     @Min(value = 1, message = "Database port must be greater than 0")
     private Integer dbPort;
-
-    @NotEmpty(message = "User name cannot be empty")
-    private String userName;
-
-    @NotEmpty(message = "User email cannot be empty")
-    private String userEmail;
 
 }

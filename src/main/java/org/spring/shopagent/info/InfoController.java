@@ -2,7 +2,7 @@ package org.spring.shopagent.info;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.spring.shopagent.info.dto.DatabaseInfoResponseDTO;
+import org.spring.shopagent.info.dto.DatabaseInfoDTO;
 import org.spring.shopagent.info.dto.DatabaseNameRequestDTO;
 import org.spring.shopagent.response.ApiResponseDto;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,7 +31,7 @@ public class InfoController {
     }
 
     @GetMapping("/info/setting/database")
-    public ApiResponseDto<DatabaseInfoResponseDTO> getDatabaseSetting() {
+    public ApiResponseDto<DatabaseInfoDTO> getDatabaseSetting() {
         return infoService.getDatabaseSetting();
     }
 }

@@ -24,6 +24,13 @@ public class ErrorResponse {
                 .build();
     }
 
+    public static ErrorResponse of(ErrorType errorType, String message) {
+        return ErrorResponse.builder()
+                .status(errorType.getCode())
+                .msg(message)
+                .build();
+    }
+
     public static ErrorResponse of(String msg){
         return ErrorResponse.builder()
                 .status(400)

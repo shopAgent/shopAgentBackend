@@ -9,6 +9,10 @@
         SELECT NOW()
     </select>
 
+    <select id="selectVersion" resultType="java.lang.String">
+        SELECT VERSION()
+    </select>
+
     <select id="selectDatabaseList" parameterType="map" resultType="String">
         SELECT schema_name
         FROM information_schema.schemata

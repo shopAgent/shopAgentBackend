@@ -28,3 +28,7 @@ logging:
     java.sql: debug
     jdbc: debug
     com.zaxxer.hikari: debug
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true

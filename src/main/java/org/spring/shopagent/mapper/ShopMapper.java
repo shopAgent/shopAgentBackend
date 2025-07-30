@@ -8,7 +8,10 @@ import java.util.List;
 public interface ShopMapper {
     String selectNow();
 
+    String selectVersion();
+
     List<String> selectDatabaseList();
 
     String selectDatabaseCheck(String databaseName);
+
 }

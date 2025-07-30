@@ -10,12 +10,14 @@ import org.spring.shopagent.exception.ErrorResponse;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ApiResponseDto<T> {
 
+    private boolean success;
     private T data;
     private String msg;
     private ErrorResponse error;
 
     @Builder
-    public ApiResponseDto(T data, String msg, ErrorResponse error) {
+    public ApiResponseDto(boolean success, T data, String msg, ErrorResponse error) {
+        this.success = success;
         this.data = data;
         this.msg = msg;
         this.error = error;

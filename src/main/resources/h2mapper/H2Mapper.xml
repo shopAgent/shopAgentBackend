@@ -9,15 +9,26 @@
         SELECT NOW()
     </select>
 
-    <update id="updateDatabaseName" parameterType="map">
-        UPDATE TABLE_INFO SET database_name = #{databaseName}
+    <update id="updateDatabaseInfo" parameterType="map">
+        UPDATE database_info
+        SET ai_provider = #{aiProvider}, token = #{token}, database_type = #{databaseType}, url = #{url},
+            db_name = #{dbName}, db_user_name = #{dbUserName}, db_password = #{dbPassword}, db_port = #{dbPort},
+            user_name = #{userName}, user_email = #{userEmail}
     </update>
 
-    <select id="selectDatabaseInfo" resultType="org.spring.shopagent.info.dto.DatabaseInfoResponseDTO">
-        SELECT
-            DATABASE_NAME AS databaseName,
-            TABLE_NAME AS tableName,
-            COLUMN_NAME AS columnName
-        FROM TABLE_INFO
+    <select id="selectDatabaseInfo" resultType="org.spring.shopagent.info.dto.DatabaseInfoDTO">
+        SELECT id, ai_provider, token, database_type, url, db_name, db_user_name, db_password, db_port,
+               user_name, user_email, create_date, update_date, data_type
+        FROM database_info
     </select>
+
+    <update id="deleteDatabaseInfo">
+        UPDATE database_info
+        SET ai_provider = '', token = '', database_type = '', url = '',
+            db_name = '', db_user_name = '', db_password = '', db_port = 0,
+            user_name = '', user_email = ''
+    </update>
+
 </mapper>
+
+

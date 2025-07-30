@@ -23,8 +23,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = CustomException.class)
     protected ResponseEntity<ApiResponseDto<Void>> handleCustomException(CustomException e) {
-        ErrorResponse responseDto = ErrorResponse.of(e.getErrorType());
+        ErrorResponse responseDto;
         log.error("handleDataException throw Exception : {}", e.getErrorType());
+        if (e.getCustomMessage() != null && !e.getCustomMessage().isEmpty())
+            responseDto = ErrorResponse.of(e.getErrorType(), e.getCustomMessage());
+        else
+            responseDto = ErrorResponse.of(e.getErrorType());
 
         return ResponseEntity
                 .status(e.getErrorType().getCode())

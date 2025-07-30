@@ -5,7 +5,7 @@ import org.spring.shopagent.config.DbAutoInitializer;
 import org.spring.shopagent.exception.CustomException;
 import org.spring.shopagent.exception.ErrorType;
 import org.spring.shopagent.h2mapper.H2Mapper;
-import org.spring.shopagent.info.dto.DatabaseInfoResponseDTO;
+import org.spring.shopagent.info.dto.DatabaseInfoDTO;
 import org.spring.shopagent.info.dto.DatabaseNameRequestDTO;
 import org.spring.shopagent.mapper.ShopMapper;
 import org.spring.shopagent.mapper.provider.ShopMapperProvider;
@@ -33,7 +33,7 @@ public class InfoService {
 
         List<String> databaseList = shopMapper.selectDatabaseList();
 
-        return ResponseUtils.ok(databaseList, MsgType.DB_CONNECTION_SUCCESS);
+        return ResponseUtils.ok(MsgType.DB_CONNECTION_SUCCESS, databaseList);
 
     }
 
@@ -46,22 +46,21 @@ public class InfoService {
         Optional.ofNullable(shopMapper.selectDatabaseCheck(dto.getDatabaseName()))
                 .orElseThrow(() -> new CustomException(ErrorType.DB_DATABASE_NOT_FOUND));
 
-        h2Mapper.updateDatabaseName(dto.getDatabaseName());
+//        h2Mapper.updateDatabaseInfo(dto);
 
         return ResponseUtils.ok(MsgType.DB_CONFIG_UPDATE_SUCCESS);
 
     }
 
-    public ApiResponseDto<DatabaseInfoResponseDTO> getDatabaseSetting() {
+    public ApiResponseDto<DatabaseInfoDTO> getDatabaseSetting() {
 
         DbAutoInitializer.isDbConnectedThrow();
 
-        DatabaseInfoResponseDTO databaseInfo2 = h2Mapper.selectDatabaseInfo();
-        DatabaseInfoResponseDTO databaseInfo = Optional.ofNullable(h2Mapper.selectDatabaseInfo())
+        DatabaseInfoDTO databaseInfo = Optional.ofNullable(h2Mapper.selectDatabaseInfo())
                 .orElseThrow(() -> new CustomException(ErrorType.DB_CONFIG_NOT_FOUND));
 
 
-        return ResponseUtils.ok(databaseInfo, MsgType.DB_CONNECTION_SUCCESS);
+        return ResponseUtils.ok(MsgType.DB_CONNECTION_SUCCESS, databaseInfo);
 
     }
 }
