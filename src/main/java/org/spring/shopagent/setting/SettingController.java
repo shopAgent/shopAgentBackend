@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.annotations.Delete;
 import org.spring.shopagent.info.dto.DatabaseInfoDTO;
 import org.spring.shopagent.response.ApiResponseDto;
+import org.spring.shopagent.setting.dto.AiConnectionTestResponseDTO;
 import org.spring.shopagent.setting.dto.DbConfigRequestDTO;
 import org.spring.shopagent.setting.dto.DbConnectionTestRequestDTO;
 import org.spring.shopagent.setting.dto.DbConnectionTestResponseDTO;
@@ -38,6 +39,11 @@ public class SettingController {
     @PostMapping("/api/config/db/connection/test")
     public ApiResponseDto<DbConnectionTestResponseDTO> dbConnectionCheck(@RequestBody DbConnectionTestRequestDTO dto) {
         return settingService.dbConnectionCheck(dto);
+    }
+
+    @PostMapping("/api/config/ai/connection/test")
+    public ApiResponseDto<AiConnectionTestResponseDTO> aiConnectionCheck() {
+        return settingService.aiConnectionCheck();
     }
 
 }

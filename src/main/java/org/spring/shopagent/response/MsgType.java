@@ -9,7 +9,7 @@ public enum MsgType {
     DB_CONNECTION_SUCCESS("DB Connection Success"),
     DB_CONFIG_UPDATE_SUCCESS("DB Config Update Success"),
     DB_CONNECTION_DISCONNECTED("DB Connection Disconnected"),
-    ;
+    AI_CONNECTION_OK("AI Connection OK"),;
 
     private final String msg;
 

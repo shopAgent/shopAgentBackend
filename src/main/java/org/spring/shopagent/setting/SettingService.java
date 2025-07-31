@@ -1,5 +1,7 @@
 package org.spring.shopagent.setting;
 
+import com.google.genai.Client;
+import com.google.genai.types.GenerateContentResponse;
 import lombok.RequiredArgsConstructor;
 import org.spring.shopagent.common.DynamicDatabaseService;
 import org.spring.shopagent.config.DbAutoInitializer;
@@ -12,6 +14,7 @@ import org.spring.shopagent.mapper.provider.ShopMapperProvider;
 import org.spring.shopagent.response.ApiResponseDto;
 import org.spring.shopagent.response.MsgType;
 import org.spring.shopagent.response.ResponseUtils;
+import org.spring.shopagent.setting.dto.AiConnectionTestResponseDTO;
 import org.spring.shopagent.setting.dto.DbConfigRequestDTO;
 import org.spring.shopagent.setting.dto.DbConnectionTestRequestDTO;
 import org.spring.shopagent.setting.dto.DbConnectionTestResponseDTO;
@@ -62,7 +65,7 @@ public class SettingService {
             if (!success)
                 throw new CustomException(ErrorType.DB_CONNECTION_ERROR);
 
-             version = shopMapperProvider.get().selectVersion();
+            version = shopMapperProvider.get().selectVersion();
 
             dynamicDatabaseService.destroy(MAPPER_NAMES);
 
@@ -127,5 +130,42 @@ public class SettingService {
         } catch (Exception e) {
             throw new CustomException(ErrorType.DB_CONNECTION_ERROR);
         }
+    }
+
+    public ApiResponseDto<AiConnectionTestResponseDTO> aiConnectionCheck() {
+
+        DatabaseInfoDTO dbConfig = h2Mapper.selectDatabaseInfo();
+
+        // AI 별로 분리 필요 현재는 Gemini만 고정
+
+        String model = "gemini-2.5-flash";
+
+        try {
+
+            Client client = Client.builder()
+                    .apiKey("AIzaSyCDO3AwF3obCO3O1E1ixjyctZmhKxIxWCw")
+                    .build();
+
+            GenerateContentResponse response =
+                    client.models.generateContent(
+                            model,
+                            "Explain how AI works in a few words",
+                            null);
+
+            System.out.println(response.text());
+
+        } catch (Exception e) {
+
+            throw new CustomException(ErrorType.AI_CONNECTION_ERROR, e.getMessage());
+
+        }
+
+        AiConnectionTestResponseDTO response = AiConnectionTestResponseDTO.builder()
+                .connection(true)
+                .provider(dbConfig.getAiProvider())
+                .model(model)
+                .build();
+
+        return ResponseUtils.ok(MsgType.AI_CONNECTION_OK, response);
     }
 }
