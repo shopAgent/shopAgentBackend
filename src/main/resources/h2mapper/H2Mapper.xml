@@ -29,6 +29,25 @@
             user_name = '', user_email = ''
     </update>
 
+    <insert id="insertSearchConfig" parameterType="map">
+        INSERT INTO search_config (type ,tool_name, description, table_name, product_name, product_image)
+        VALUES ('product', #{toolName}, #{description}, #{tableName}, #{productName}, #{productImage});
+    </insert>
+
+    <select id="selectSearchConfigByIdx" parameterType="Long" resultType="org.spring.shopagent.setting.dto.SearchRequestDTO">
+        SELECT idx AS idxSearchConfig, tool_name AS toolName, description, table_name AS tableName,
+               product_name AS productName, product_image AS productImage
+        FROM search_config
+        WHERE idx = #{idxSearchConfig}
+    </select>
+
+    <update id="updateSearchConfig" parameterType="map">
+        UPDATE search_config
+        SET tool_name = #{toolName}, description = #{description}, table_name = #{tableName}, 
+            product_name = #{productName}, product_image = #{productImage}
+        WHERE idx = #{idxSearchConfig}
+    </update>
+
 </mapper>
 
 

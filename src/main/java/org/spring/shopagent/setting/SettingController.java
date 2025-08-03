@@ -1,13 +1,11 @@
 package org.spring.shopagent.setting;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.annotations.Delete;
 import org.spring.shopagent.info.dto.DatabaseInfoDTO;
 import org.spring.shopagent.response.ApiResponseDto;
-import org.spring.shopagent.setting.dto.AiConnectionTestResponseDTO;
-import org.spring.shopagent.setting.dto.DbConfigRequestDTO;
-import org.spring.shopagent.setting.dto.DbConnectionTestRequestDTO;
-import org.spring.shopagent.setting.dto.DbConnectionTestResponseDTO;
+import org.spring.shopagent.setting.dto.*;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -44,6 +42,26 @@ public class SettingController {
     @PostMapping("/api/config/ai/connection/test")
     public ApiResponseDto<AiConnectionTestResponseDTO> aiConnectionCheck() {
         return settingService.aiConnectionCheck();
+    }
+
+    @PostMapping("/api/config/search")
+    public ApiResponseDto<Void> insertSearchConfig(@RequestBody @Valid SearchRequestDTO dto) {
+        return settingService.insertSearchConfig(dto);
+    }
+
+    @GetMapping("/api/config/search/{idxSearchConfig}")
+    public ApiResponseDto<SearchRequestDTO> getSearchConfig(
+            @PathVariable Long idxSearchConfig
+    ) {
+        return settingService.getSearchConfig(idxSearchConfig);
+    }
+
+    @PutMapping("/api/config/search/{idxSearchConfig}")
+    public ApiResponseDto<Void> updateSearchConfig(
+            @RequestBody @Valid SearchRequestDTO dto,
+            @PathVariable Long idxSearchConfig) {
+        dto.setIdxSearchConfig(idxSearchConfig);
+        return settingService.updateSearchConfig(dto);
     }
 
 }

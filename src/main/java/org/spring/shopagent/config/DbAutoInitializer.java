@@ -36,7 +36,7 @@ public class DbAutoInitializer implements ApplicationRunner {
                     dbInfo.getDbPort());
 
             dbConnected = dynamicDatabaseService.initializeDatabase(url, dbInfo.getDbUserName(), dbInfo.getDbPassword(), true);
-        } catch (CustomException e) {
+        } catch (Exception e) {
 
         }
     }

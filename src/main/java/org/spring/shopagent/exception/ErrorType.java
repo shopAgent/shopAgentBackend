@@ -10,7 +10,8 @@ public enum ErrorType {
     DB_CONFIG_NOT_FOUND(503, "DB Config Not Found, please set up the database first"),
     DB_DATABASE_NOT_FOUND(504, "Database Not Found"),
     DB_DISCONNECT_FAIL(505, "DB Disconnect Failed"),
-    AI_CONNECTION_ERROR(506, "AI Connection Failed"),;
+    AI_CONNECTION_ERROR(506, "AI Connection Failed"),
+    DATA_NOT_FOUND(507, "Data Not Found"),;
 
     private int code;
     private String msg;

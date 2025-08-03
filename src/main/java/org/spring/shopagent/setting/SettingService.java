@@ -1,8 +1,7 @@
 package org.spring.shopagent.setting;
 
-import com.google.genai.Client;
-import com.google.genai.types.GenerateContentResponse;
 import lombok.RequiredArgsConstructor;
+import org.spring.shopagent.common.AiClientCallService;
 import org.spring.shopagent.common.DynamicDatabaseService;
 import org.spring.shopagent.config.DbAutoInitializer;
 import org.spring.shopagent.exception.CustomException;
@@ -14,10 +13,7 @@ import org.spring.shopagent.mapper.provider.ShopMapperProvider;
 import org.spring.shopagent.response.ApiResponseDto;
 import org.spring.shopagent.response.MsgType;
 import org.spring.shopagent.response.ResponseUtils;
-import org.spring.shopagent.setting.dto.AiConnectionTestResponseDTO;
-import org.spring.shopagent.setting.dto.DbConfigRequestDTO;
-import org.spring.shopagent.setting.dto.DbConnectionTestRequestDTO;
-import org.spring.shopagent.setting.dto.DbConnectionTestResponseDTO;
+import org.spring.shopagent.setting.dto.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,7 +28,10 @@ public class SettingService {
 
     private final ShopMapperProvider shopMapperProvider;
 
+    private final AiClientCallService aiClientCallService;
+
     private final H2Mapper h2Mapper;
+
 
     private static final List<String> MAPPER_NAMES = List.of("shopMapper");
 
@@ -142,17 +141,7 @@ public class SettingService {
 
         try {
 
-            Client client = Client.builder()
-                    .apiKey("AIzaSyCDO3AwF3obCO3O1E1ixjyctZmhKxIxWCw")
-                    .build();
-
-            GenerateContentResponse response =
-                    client.models.generateContent(
-                            model,
-                            "Explain how AI works in a few words",
-                            null);
-
-            System.out.println(response.text());
+            System.out.println(aiClientCallService.callAiClient("say hello"));
 
         } catch (Exception e) {
 
@@ -167,5 +156,43 @@ public class SettingService {
                 .build();
 
         return ResponseUtils.ok(MsgType.AI_CONNECTION_OK, response);
+    }
+
+    public ApiResponseDto<Void> insertSearchConfig(SearchRequestDTO dto) {
+
+        DbAutoInitializer.isDbConnectedThrow();
+
+        h2Mapper.insertSearchConfig(dto);
+
+        return ResponseUtils.ok(MsgType.SEARCH_CONFIG_INSERT_SUCCESS);
+
+    }
+
+    public ApiResponseDto<SearchRequestDTO> getSearchConfig(Long idxSearchConfig) {
+
+        DbAutoInitializer.isDbConnectedThrow();
+
+        SearchRequestDTO searchConfig = h2Mapper.selectSearchConfigByIdx(idxSearchConfig);
+
+        return ResponseUtils.ok(MsgType.DATA_SELECT_SUCCESS, searchConfig);
+
+    }
+
+    public ApiResponseDto<Void> updateSearchConfig(SearchRequestDTO dto) {
+
+        DbAutoInitializer.isDbConnectedThrow();
+
+        if (dto.getIdxSearchConfig() == null)
+            throw new CustomException(ErrorType.DATA_NOT_FOUND);
+
+
+        SearchRequestDTO searchConfig = h2Mapper.selectSearchConfigByIdx(dto.getIdxSearchConfig());
+        if (searchConfig == null)
+            throw new CustomException(ErrorType.DATA_NOT_FOUND);
+
+        h2Mapper.updateSearchConfig(dto);
+
+        return ResponseUtils.ok(MsgType.SEARCH_CONFIG_UPDATE_SUCCESS);
+
     }
 }
