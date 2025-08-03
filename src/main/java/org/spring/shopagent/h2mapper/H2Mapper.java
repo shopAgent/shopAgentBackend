@@ -5,6 +5,8 @@ import org.spring.shopagent.info.dto.DatabaseInfoDTO;
 import org.spring.shopagent.setting.dto.DbConfigRequestDTO;
 import org.spring.shopagent.setting.dto.SearchRequestDTO;
 
+import java.util.List;
+
 @Mapper
 public interface H2Mapper {
 
@@ -21,6 +23,8 @@ public interface H2Mapper {
     int insertSearchConfig(SearchRequestDTO dto);
 
     SearchRequestDTO selectSearchConfigByIdx(Long idx);
+
+    List<SearchRequestDTO> selectSearchConfigByType(String type);
 
     int updateSearchConfig(SearchRequestDTO dto);
 }

@@ -24,4 +24,22 @@
         FROM information_schema.schemata
         WHERE schema_name = #{databaseName};
     </select>
+
+    <select id="selectTableList" resultType="String">
+        SELECT table_name
+        FROM information_schema.tables
+        WHERE table_schema = DATABASE()
+        AND table_type = 'BASE TABLE'
+        ORDER BY table_name
+    </select>
+
+    <select id="selectTableColumns" parameterType="map" resultType="org.spring.shopagent.setting.dto.TableColumnResponseDTO">
+        SELECT 
+            column_name as columnName, data_type as dataType, is_nullable as isNullable,
+            column_default as columnDefault, column_comment as columnComment
+        FROM information_schema.columns
+        WHERE table_schema = DATABASE()
+        AND table_name = #{tableName}
+        ORDER BY ordinal_position
+    </select>
 </mapper>

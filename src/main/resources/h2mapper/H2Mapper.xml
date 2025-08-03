@@ -41,6 +41,13 @@
         WHERE idx = #{idxSearchConfig}
     </select>
 
+    <select id="selectSearchConfigByType" parameterType="String" resultType="org.spring.shopagent.setting.dto.SearchRequestDTO">
+        SELECT idx AS idxSearchConfig, tool_name AS toolName, description, table_name AS tableName,
+               product_name AS productName, product_image AS productImage
+        FROM search_config
+        WHERE type = #{type}
+    </select>
+
     <update id="updateSearchConfig" parameterType="map">
         UPDATE search_config
         SET tool_name = #{toolName}, description = #{description}, table_name = #{tableName}, 

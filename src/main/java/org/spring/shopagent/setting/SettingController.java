@@ -8,6 +8,8 @@ import org.spring.shopagent.response.ApiResponseDto;
 import org.spring.shopagent.setting.dto.*;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 public class SettingController {
@@ -62,6 +64,18 @@ public class SettingController {
             @PathVariable Long idxSearchConfig) {
         dto.setIdxSearchConfig(idxSearchConfig);
         return settingService.updateSearchConfig(dto);
+    }
+
+    @GetMapping("/api/config/tables")
+    public ApiResponseDto<List<String>> getTableList() {
+        return settingService.getTableList();
+    }
+
+    @GetMapping("/api/config/tables/{tableName}/columns")
+    public ApiResponseDto<List<TableColumnResponseDTO>> getTableColumns(
+            @PathVariable String tableName
+    ) {
+        return settingService.getTableColumns(tableName);
     }
 
 }

@@ -195,4 +195,26 @@ public class SettingService {
         return ResponseUtils.ok(MsgType.SEARCH_CONFIG_UPDATE_SUCCESS);
 
     }
+
+    public ApiResponseDto<List<String>> getTableList() {
+
+        DbAutoInitializer.isDbConnectedThrow();
+
+        ShopMapper shopMapper = shopMapperProvider.get();
+        List<String> tableList = shopMapper.selectTableList();
+
+        return ResponseUtils.ok(MsgType.DATA_SELECT_SUCCESS, tableList);
+
+    }
+
+    public ApiResponseDto<List<TableColumnResponseDTO>> getTableColumns(String tableName) {
+
+        DbAutoInitializer.isDbConnectedThrow();
+
+        ShopMapper shopMapper = shopMapperProvider.get();
+        List<TableColumnResponseDTO> columns = shopMapper.selectTableColumns(tableName);
+
+        return ResponseUtils.ok(MsgType.DATA_SELECT_SUCCESS, columns);
+
+    }
 }
