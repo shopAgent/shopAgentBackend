@@ -7,7 +7,7 @@ on:
 env:
   REACT_REPO: shopAgent/studio
   REACT_BUILD_DIR: frontend-build
-  SPRING_STATIC_PATH: shopAgentBackend/src/main/resources/static
+  SPRING_STATIC_PATH: shopAgent/src/main/resources/static
 
 jobs:
   build-and-deploy:
@@ -35,8 +35,9 @@ jobs:
 
     - name: Copy React Build to Spring Boot Static Resources
       run: |
-        rm -rf ${{ env.SPRING_STATIC_PATH }}/*
-        cp -r ${{ env.REACT_BUILD_DIR }}/build/* ${{ env.SPRING_STATIC_PATH }}/
+        mkdir -p shopAgent/src/main/resources/static
+        rm -rf shopAgent/src/main/resources/static/*
+        cp -r ${{ env.REACT_BUILD_DIR }}/build/* shopAgent/src/main/resources/static/
 
     - name: Set up JDK 21
       uses: actions/setup-java@v3
