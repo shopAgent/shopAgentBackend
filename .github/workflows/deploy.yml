@@ -27,7 +27,7 @@ jobs:
         npm install
         CI=false npm run build 
 
-    - name: Build React App (Ignore ESLint Errors)
+    - name: Build React App (Lint 무시) (임시)
       working-directory: ${{ env.REACT_BUILD_DIR }}
       run: |
         npm install
