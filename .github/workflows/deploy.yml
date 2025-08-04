@@ -46,7 +46,7 @@ jobs:
         distribution: 'temurin'
 
     - name: Build Spring Boot App
-      working-directory: shopAgentBackend
+      working-directory: shopAgent
       run: ./gradlew bootJar
 
     # 👉 EC2 서버로 배포 시작
