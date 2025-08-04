@@ -37,7 +37,7 @@ jobs:
       run: |
         mkdir -p shopAgent/src/main/resources/static
         rm -rf shopAgent/src/main/resources/static/*
-        cp -r ${{ env.REACT_BUILD_DIR }}/build/* shopAgent/src/main/resources/static/
+        cp -r frontend-build/build/* shopAgent/src/main/resources/static/
 
     - name: Set up JDK 21
       uses: actions/setup-java@v3
@@ -53,7 +53,6 @@ jobs:
         ls -al shopAgentBackend || true
 
     - name: Build Spring Boot App
-      working-directory: shopAgent
       run: ./gradlew bootJar
 
     # 👉 EC2 서버로 배포 시작
