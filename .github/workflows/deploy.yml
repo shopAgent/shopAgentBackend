@@ -36,9 +36,9 @@ jobs:
 
     - name: Copy React Build to Spring Boot Static Resources
       run: |
-        mkdir -p shopAgent/src/main/resources/static
-        rm -rf shopAgent/src/main/resources/static/*
-        cp -r frontend-build/build/* shopAgent/src/main/resources/static/
+        mkdir -p src/main/resources/static
+        rm -rf src/main/resources/static/*
+        cp -r frontend-build/build/* src/main/resources/static/
 
     - name: Print Spring static/ 복사 결과
       run: |
