@@ -45,6 +45,13 @@ jobs:
         java-version: '21'
         distribution: 'temurin'
 
+    - name: Print current directory structure
+      run: |
+        pwd
+        ls -al
+        ls -al shopAgent || true
+        ls -al shopAgentBackend || true
+
     - name: Build Spring Boot App
       working-directory: shopAgent
       run: ./gradlew bootJar
