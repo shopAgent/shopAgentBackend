@@ -43,9 +43,9 @@ jobs:
     - name: Print Spring static/ 복사 결과
       run: |
         echo "✅ Spring static/ 폴더에 복사된 결과"
-        ls -al shopAgent/src/main/resources/static/
-        ls -al shopAgent/src/main/resources/static/static || true
-        cat shopAgent/src/main/resources/static/index.html | head -n 5
+        ls -al src/main/resources/static/
+        ls -al src/main/resources/static/static || true
+        cat src/main/resources/static/index.html | head -n 5
 
 
     - name: Set up JDK 21
