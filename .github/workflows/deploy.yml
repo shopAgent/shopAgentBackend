@@ -7,7 +7,7 @@ on:
 env:
   REACT_REPO: shopAgent/studio
   REACT_BUILD_DIR: frontend-build
-  SPRING_STATIC_PATH: shopAgent/src/main/resources/static
+  SPRING_STATIC_PATH: shopAgentBackend/src/main/resources/static
 
 jobs:
   build-and-deploy:
