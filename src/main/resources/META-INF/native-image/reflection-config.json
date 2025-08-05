@@ -1,0 +1,8 @@
+[
+  {
+    "name": "org.apache.ibatis.session.Configuration",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  }
+]
