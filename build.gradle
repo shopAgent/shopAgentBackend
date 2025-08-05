@@ -18,10 +18,9 @@ graalvmNative {
     binaries {
         main {
             imageName = 'shop-agent'
-            buildArgs.add('--enable-all-security-services')
+            buildArgs.add('--no-fallback')
             buildArgs.add('--report-unsupported-elements-at-runtime')
-            buildArgs.add('--initialize-at-build-time=org.apache.ibatis.logging')
-            buildArgs.add('--initialize-at-run-time=org.apache.ibatis.session.Configuration')
+            buildArgs.add('--initialize-at-build-time=org.apache.ibatis')
         }
     }
 }

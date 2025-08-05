@@ -55,6 +55,11 @@ jobs:
           echo "🔍 GraalVM native-image error 로그:"
           find build -name '*.log' -exec cat {} \; || echo "Log 파일 없음"
 
+      - name: Run nativeCompile and save logs
+        run: |
+          ./gradlew nativeCompile --info > native-image.log 2>&1 || true
+          cat native-image.log | tail -n 100
+
       - name: Check Native Executable
         run: |
           echo "Native Executable 확인"
