@@ -20,8 +20,8 @@ graalvmNative {
             imageName = 'shop-agent'
             buildArgs.add('--no-fallback')
             buildArgs.add('--report-unsupported-elements-at-runtime')
-            buildArgs.add('--initialize-at-build-time=org.apache.ibatis,ch.qos.logback,org.slf4j')
-            buildArgs.add('--initialize-at-run-time=com.zaxxer.hikari,com.mysql.cj,io.netty,org.apache.commons.logging')
+            buildArgs.add('--initialize-at-build-time=org.apache.ibatis')
+            buildArgs.add('--initialize-at-run-time=com.zaxxer.hikari,com.mysql.cj,io.netty,org.apache.commons.logging.LogFactory,org.apache.commons.logging.LogFactoryService')
             buildArgs.add('--enable-url-protocols=http,https')
             buildArgs.add('-H:+AddAllCharsets')
             buildArgs.add('-H:+UnlockExperimentalVMOptions')
@@ -44,19 +44,33 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation('org.springframework.boot:spring-boot-starter-web') {
+        exclude group: 'commons-logging', module: 'commons-logging'
+    }
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.h2database:h2'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    implementation 'com.zaxxer:HikariCP:5.1.0'
-    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
-    implementation 'mysql:mysql-connector-java:8.0.33'
-    implementation 'org.reflections:reflections:0.10.2'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'com.google.genai:google-genai:1.0.0'
+    implementation('com.zaxxer:HikariCP:5.1.0') {
+        exclude group: 'commons-logging', module: 'commons-logging'
+    }
+    implementation('org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3') {
+        exclude group: 'commons-logging', module: 'commons-logging'
+    }
+    implementation('mysql:mysql-connector-java:8.0.33') {
+        exclude group: 'commons-logging', module: 'commons-logging'
+    }
+    implementation('org.reflections:reflections:0.10.2') {
+        exclude group: 'commons-logging', module: 'commons-logging'
+    }
+    implementation('org.springframework.boot:spring-boot-starter-validation') {
+        exclude group: 'commons-logging', module: 'commons-logging'
+    }
+    implementation('com.google.genai:google-genai:1.0.0') {
+        exclude group: 'commons-logging', module: 'commons-logging'
+    }
 
 }
 
