@@ -46,6 +46,9 @@ repositories {
 dependencies {
     implementation('org.springframework.boot:spring-boot-starter-web') {
         exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+        exclude group: 'ch.qos.logback', module: 'logback-classic'
+        exclude group: 'ch.qos.logback', module: 'logback-core'
+        exclude group: 'org.apache.logging.log4j', module: 'log4j-to-slf4j'
         exclude group: 'commons-logging', module: 'commons-logging'
     }
     implementation 'org.springframework.boot:spring-boot-starter-log4j2'
@@ -53,7 +56,13 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.h2database:h2'
     annotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+        exclude group: 'ch.qos.logback', module: 'logback-classic'
+        exclude group: 'ch.qos.logback', module: 'logback-core'
+        exclude group: 'org.apache.logging.log4j', module: 'log4j-to-slf4j'
+    }
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     implementation('com.zaxxer:HikariCP:5.1.0') {
@@ -61,6 +70,9 @@ dependencies {
     }
     implementation('org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3') {
         exclude group: 'commons-logging', module: 'commons-logging'
+        exclude group: 'ch.qos.logback', module: 'logback-classic'
+        exclude group: 'ch.qos.logback', module: 'logback-core'
+        exclude group: 'org.apache.logging.log4j', module: 'log4j-to-slf4j'
     }
     implementation('mysql:mysql-connector-java:8.0.33') {
         exclude group: 'commons-logging', module: 'commons-logging'
@@ -70,6 +82,9 @@ dependencies {
     }
     implementation('org.springframework.boot:spring-boot-starter-validation') {
         exclude group: 'commons-logging', module: 'commons-logging'
+        exclude group: 'ch.qos.logback', module: 'logback-classic'
+        exclude group: 'ch.qos.logback', module: 'logback-core'
+        exclude group: 'org.apache.logging.log4j', module: 'log4j-to-slf4j'
     }
     implementation('com.google.genai:google-genai:1.0.0') {
         exclude group: 'commons-logging', module: 'commons-logging'
