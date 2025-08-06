@@ -21,7 +21,7 @@ graalvmNative {
             buildArgs.add('--no-fallback')
             buildArgs.add('--report-unsupported-elements-at-runtime')
             buildArgs.add('--initialize-at-build-time=org.apache.ibatis')
-            buildArgs.add('--initialize-at-run-time=com.zaxxer.hikari,com.mysql.cj,io.netty,org.apache.logging.log4j')
+            buildArgs.add('--initialize-at-run-time=com.zaxxer.hikari,com.mysql.cj,io.netty,com.fasterxml.jackson')
             buildArgs.add('--enable-url-protocols=http,https')
             buildArgs.add('-H:+AddAllCharsets')
             buildArgs.add('-H:+UnlockExperimentalVMOptions')
@@ -51,7 +51,8 @@ dependencies {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-to-slf4j'
         exclude group: 'commons-logging', module: 'commons-logging'
     }
-    implementation 'org.springframework.boot:spring-boot-starter-log4j2'
+    // Simple SLF4J logging with no-op logger for native image
+    implementation 'org.slf4j:slf4j-simple:2.0.7'
     
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.h2database:h2'
