@@ -15,13 +15,15 @@ java {
 }
 
 graalvmNative {
+    toolchainDetection = false
     binaries {
         main {
             imageName = 'shop-agent'
             buildArgs.add('--no-fallback')
             buildArgs.add('--report-unsupported-elements-at-runtime')
             buildArgs.add('--initialize-at-build-time=org.apache.ibatis')
-            buildArgs.add('--initialize-at-run-time=com.zaxxer.hikari,com.mysql.cj,io.netty,com.fasterxml.jackson,org.slf4j')
+            buildArgs.add('--initialize-at-run-time=com.zaxxer.hikari,com.mysql.cj,io.netty,com.fasterxml.jackson')
+            buildArgs.add('--initialize-at-build-time=org.slf4j')
             buildArgs.add('--enable-url-protocols=http,https')
             buildArgs.add('-H:+AddAllCharsets')
             buildArgs.add('-H:+UnlockExperimentalVMOptions')
