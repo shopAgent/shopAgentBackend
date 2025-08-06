@@ -14,9 +14,6 @@ spring:
     pathmatch:
       matching-strategy: ant_path_matcher
 
-  logging:
-    level:
-      org.hibernate.SQL: info
 custom:
   h2:
     url: jdbc:h2:file:./data/shopagent-h2-db
@@ -26,12 +23,7 @@ custom:
 
 logging:
   level:
-    root: info
-    org.mybatis: debug
-    org.apache.ibatis: debug
-    java.sql: debug
-    jdbc: debug
-    com.zaxxer.hikari: debug
+    root: warn
 
 mybatis:
   configuration:

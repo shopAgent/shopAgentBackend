@@ -51,8 +51,8 @@ dependencies {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-to-slf4j'
         exclude group: 'commons-logging', module: 'commons-logging'
     }
-    // Simple SLF4J logging with no-op logger for native image
-    implementation 'org.slf4j:slf4j-simple:2.0.7'
+    // No-op SLF4J implementation for native image
+    implementation 'org.slf4j:slf4j-nop:2.0.7'
     
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.h2database:h2'
