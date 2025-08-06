@@ -21,7 +21,7 @@ graalvmNative {
             buildArgs.add('--no-fallback')
             buildArgs.add('--report-unsupported-elements-at-runtime')
             buildArgs.add('--initialize-at-build-time=org.apache.ibatis')
-            buildArgs.add('--initialize-at-run-time=com.zaxxer.hikari,com.mysql.cj,io.netty,com.fasterxml.jackson')
+            buildArgs.add('--initialize-at-run-time=com.zaxxer.hikari,com.mysql.cj,io.netty,com.fasterxml.jackson,org.slf4j')
             buildArgs.add('--enable-url-protocols=http,https')
             buildArgs.add('-H:+AddAllCharsets')
             buildArgs.add('-H:+UnlockExperimentalVMOptions')
@@ -37,6 +37,13 @@ configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
+    all {
+        exclude group: 'ch.qos.logback', module: 'logback-classic'
+        exclude group: 'ch.qos.logback', module: 'logback-core'
+        exclude group: 'org.apache.logging.log4j', module: 'log4j-to-slf4j'
+        exclude group: 'commons-logging', module: 'commons-logging'
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+    }
 }
 
 repositories {
@@ -44,52 +51,24 @@ repositories {
 }
 
 dependencies {
-    implementation('org.springframework.boot:spring-boot-starter-web') {
-        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
-        exclude group: 'ch.qos.logback', module: 'logback-classic'
-        exclude group: 'ch.qos.logback', module: 'logback-core'
-        exclude group: 'org.apache.logging.log4j', module: 'log4j-to-slf4j'
-        exclude group: 'commons-logging', module: 'commons-logging'
-        exclude group: 'org.slf4j', module: 'slf4j-api'
-    }
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    
+    // Add SLF4J NOP to satisfy MyBatis dependency
+    implementation 'org.slf4j:slf4j-nop:2.0.7'
     
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.h2database:h2'
     annotationProcessor 'org.projectlombok:lombok'
     
-    testImplementation('org.springframework.boot:spring-boot-starter-test') {
-        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
-        exclude group: 'ch.qos.logback', module: 'logback-classic'
-        exclude group: 'ch.qos.logback', module: 'logback-core'
-        exclude group: 'org.apache.logging.log4j', module: 'log4j-to-slf4j'
-    }
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    implementation('com.zaxxer:HikariCP:5.1.0') {
-        exclude group: 'commons-logging', module: 'commons-logging'
-    }
-    implementation('org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3') {
-        exclude group: 'commons-logging', module: 'commons-logging'
-        exclude group: 'ch.qos.logback', module: 'logback-classic'
-        exclude group: 'ch.qos.logback', module: 'logback-core'
-        exclude group: 'org.apache.logging.log4j', module: 'log4j-to-slf4j'
-        exclude group: 'org.slf4j', module: 'slf4j-api'
-    }
-    implementation('mysql:mysql-connector-java:8.0.33') {
-        exclude group: 'commons-logging', module: 'commons-logging'
-    }
-    implementation('org.reflections:reflections:0.10.2') {
-        exclude group: 'commons-logging', module: 'commons-logging'
-    }
-    implementation('org.springframework.boot:spring-boot-starter-validation') {
-        exclude group: 'commons-logging', module: 'commons-logging'
-        exclude group: 'ch.qos.logback', module: 'logback-classic'
-        exclude group: 'ch.qos.logback', module: 'logback-core'
-        exclude group: 'org.apache.logging.log4j', module: 'log4j-to-slf4j'
-    }
-    implementation('com.google.genai:google-genai:1.0.0') {
-        exclude group: 'commons-logging', module: 'commons-logging'
-    }
+    implementation 'com.zaxxer:HikariCP:5.1.0'
+    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
+    implementation 'mysql:mysql-connector-java:8.0.33'
+    implementation 'org.reflections:reflections:0.10.2'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'com.google.genai:google-genai:1.0.0'
 
 }
 
