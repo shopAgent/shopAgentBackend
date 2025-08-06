@@ -21,7 +21,7 @@ graalvmNative {
             buildArgs.add('--no-fallback')
             buildArgs.add('--report-unsupported-elements-at-runtime')
             buildArgs.add('--initialize-at-build-time=org.apache.ibatis')
-            buildArgs.add('--initialize-at-run-time=com.zaxxer.hikari,com.mysql.cj,io.netty,com.fasterxml.jackson,org.slf4j')
+            buildArgs.add('--initialize-at-run-time=com.zaxxer.hikari,com.mysql.cj,io.netty,com.fasterxml.jackson')
             buildArgs.add('--enable-url-protocols=http,https')
             buildArgs.add('-H:+AddAllCharsets')
             buildArgs.add('-H:+UnlockExperimentalVMOptions')
@@ -50,9 +50,8 @@ dependencies {
         exclude group: 'ch.qos.logback', module: 'logback-core'
         exclude group: 'org.apache.logging.log4j', module: 'log4j-to-slf4j'
         exclude group: 'commons-logging', module: 'commons-logging'
+        exclude group: 'org.slf4j', module: 'slf4j-api'
     }
-    // No-op SLF4J implementation for native image
-    implementation 'org.slf4j:slf4j-nop:2.0.7'
     
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.h2database:h2'
@@ -74,6 +73,7 @@ dependencies {
         exclude group: 'ch.qos.logback', module: 'logback-classic'
         exclude group: 'ch.qos.logback', module: 'logback-core'
         exclude group: 'org.apache.logging.log4j', module: 'log4j-to-slf4j'
+        exclude group: 'org.slf4j', module: 'slf4j-api'
     }
     implementation('mysql:mysql-connector-java:8.0.33') {
         exclude group: 'commons-logging', module: 'commons-logging'
