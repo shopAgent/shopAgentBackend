@@ -1,0 +1,33 @@
+{
+  "resources": {
+    "includes": [
+      {
+        "pattern": ".*\\.xml"
+      },
+      {
+        "pattern": ".*\\.yml"
+      },
+      {
+        "pattern": ".*\\.yaml"
+      },
+      {
+        "pattern": ".*\\.properties"
+      },
+      {
+        "pattern": "application.*"
+      },
+      {
+        "pattern": "mapper/.*"
+      },
+      {
+        "pattern": "h2mapper/.*"
+      },
+      {
+        "pattern": "static/.*"
+      },
+      {
+        "pattern": "templates/.*"
+      }
+    ]
+  }
+}

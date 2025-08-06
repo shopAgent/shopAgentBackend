@@ -1,0 +1,12 @@
+[
+  {
+    "interfaces": [
+      "org.spring.shopagent.h2mapper.H2Mapper"
+    ]
+  },
+  {
+    "interfaces": [
+      "org.spring.shopagent.mapper.ShopMapper"
+    ]
+  }
+]

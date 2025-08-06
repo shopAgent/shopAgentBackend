@@ -20,7 +20,15 @@ graalvmNative {
             imageName = 'shop-agent'
             buildArgs.add('--no-fallback')
             buildArgs.add('--report-unsupported-elements-at-runtime')
-            buildArgs.add('--initialize-at-build-time=org.apache.ibatis')
+            buildArgs.add('--initialize-at-build-time=org.apache.ibatis,ch.qos.logback,org.slf4j')
+            buildArgs.add('--initialize-at-run-time=com.zaxxer.hikari,com.mysql.cj,io.netty')
+            buildArgs.add('--enable-url-protocols=http,https')
+            buildArgs.add('--enable-all-security-services')
+            buildArgs.add('-H:+AddAllCharsets')
+            buildArgs.add('-H:IncludeResources=.*\\.xml')
+            buildArgs.add('-H:IncludeResources=.*\\.yml')
+            buildArgs.add('-H:IncludeResources=.*\\.properties')
+            buildArgs.add('-H:+ReportExceptionStackTraces')
         }
     }
 }
