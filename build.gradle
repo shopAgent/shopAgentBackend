@@ -21,7 +21,7 @@ graalvmNative {
             imageName = 'shop-agent'
             buildArgs.add('--no-fallback')
             buildArgs.add('--report-unsupported-elements-at-runtime')
-            buildArgs.add('--initialize-at-build-time=org.apache.ibatis')
+            buildArgs.add('--initialize-at-run-time=org.apache.ibatis')
             buildArgs.add('--initialize-at-run-time=com.zaxxer.hikari,com.mysql.cj,io.netty,com.fasterxml.jackson')
             buildArgs.add('--initialize-at-build-time=org.slf4j')
             buildArgs.add('--enable-url-protocols=http,https')
@@ -31,7 +31,23 @@ graalvmNative {
             buildArgs.add('-H:IncludeResources=.*\\.yml')
             buildArgs.add('-H:IncludeResources=.*\\.properties')
             buildArgs.add('-H:+ReportExceptionStackTraces')
+            buildArgs.add('-H:+AllowIncompleteClasspath')
+            buildArgs.add('--initialize-at-run-time=org.mybatis.spring')
+            buildArgs.add('--initialize-at-run-time=org.apache.ibatis.session')
+            buildArgs.add('--initialize-at-run-time=org.apache.ibatis.mapping')
         }
+    }
+}
+
+// 개발용 빠른 Native Image 빌드
+task nativeCompileDev {
+    group = 'native'
+    description = '빠른 개발용 Native Image 빌드'
+    
+    dependsOn 'nativeCompile'
+    
+    doLast {
+        println '개발용 Native Image 빌드 완료'
     }
 }
 
