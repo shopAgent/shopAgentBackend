@@ -1,4 +1,4 @@
-name: CI/CD to EC2 - Spring Boot Native + React
+name: CI/CD to EC2 - Spring Boot + React
 
 on:
   push:
@@ -7,77 +7,78 @@ on:
 env:
   REACT_REPO: shopAgent/studio
   REACT_BUILD_DIR: frontend-build
+  SPRING_STATIC_PATH: shopAgent/src/main/resources/static
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Spring Boot Repository
-        uses: actions/checkout@v3
+    - name: Checkout Spring Boot Repository
+      uses: actions/checkout@v3
 
-      - name: Clone React Repository (Private)
-        run: |
-          git clone https://x-access-token:${{ secrets.REACT_REPO_TOKEN }}@github.com/${{ env.REACT_REPO }} ${{ env.REACT_BUILD_DIR }}
+    - name: Clone React Repository (Private)
+      run: |
+        git clone https://x-access-token:${{ secrets.REACT_REPO_TOKEN }}@github.com/${{ env.REACT_REPO }} ${{ env.REACT_BUILD_DIR }}
 
-      - name: Build React App (Ignore Lint Temporarily)
-        working-directory: ${{ env.REACT_BUILD_DIR }}
-        run: |
-          npm install
-          CI=false npm run build
+    - name: Build React App (Lint 무시) (임시)
+      working-directory: ${{ env.REACT_BUILD_DIR }}
+      run: |
+        npm install
+        CI=false npm run build
 
-      - name: Copy React Build to Spring Boot Static Resources
-        run: |
-          mkdir -p src/main/resources/static
-          rm -rf src/main/resources/static/*
-          cp -r ${{ env.REACT_BUILD_DIR }}/build/* src/main/resources/static/
+    - name: Print React Build Output
+      run: |
+        echo "✅ React Build 결과 확인"
+        ls -al frontend-build/build/
+        ls -al frontend-build/build/static || true
+        cat frontend-build/build/index.html | head -n 5
 
-      - name: Print Static Directory
-        run: |
-          echo "static 디렉토리 내용 확인"
-          ls -al src/main/resources/static/
-          cat src/main/resources/static/index.html | head -n 10
+    - name: Copy React Build to Spring Boot Static Resources
+      run: |
+        mkdir -p src/main/resources/static
+        rm -rf src/main/resources/static/*
+        cp -r frontend-build/build/* src/main/resources/static/
 
-      - name: Set up GraalVM
-        uses: graalvm/setup-graalvm@v1
-        with:
-          version: '21.0.8'
-          java-version: '21'
-          distribution: 'graalvm'
-          components: 'native-image'
+    - name: Print Spring static/ 복사 결과
+      run: |
+        echo "✅ Spring static/ 폴더에 복사된 결과"
+        ls -al shopAgent/src/main/resources/static/
+        ls -al shopAgent/src/main/resources/static/static || true
+        cat shopAgent/src/main/resources/static/index.html | head -n 5
 
-      - name: Build Native Executable
-        run: ./gradlew nativeCompile
 
-      - name: Dump native-image error log
-        if: failure()
-        run: |
-          echo "🔍 GraalVM native-image error 로그:"
-          find build -name '*.log' -exec cat {} \; || echo "Log 파일 없음"
+    - name: Set up JDK 21
+      uses: actions/setup-java@v3
+      with:
+        java-version: '21'
+        distribution: 'temurin'
 
-      - name: Run nativeCompile and save logs
-        run: |
-          ./gradlew nativeCompile --info > native-image.log 2>&1 || true
-          cat native-image.log | tail -n 100
+    - name: Print current directory structure
+      run: |
+        pwd
+        ls -al
+        ls -al shopAgent || true
+        ls -al shopAgentBackend || true
 
-      - name: Check Native Executable
-        run: |
-          echo "Native Executable 확인"
-          ls -al build/native/nativeCompile/
-          file build/native/nativeCompile/*
+    - name: Build Spring Boot App
+      run: ./gradlew bootJar
 
-      - name: Add SSH Key
-        run: |
-          echo "${{ secrets.EC2_SSH_KEY }}" > private_key.pem
-          chmod 600 private_key.pem
+    - name: Fail if index.html is missing from jar
+      run: |
+        if ! unzip -l build/libs/*.jar | grep -q 'static/index.html'; then
+          echo " index.html 이 jar 파일에 포함되지 않았습니다. 빌드 순서 확인 필요!"
+          exit 1
+        fi
 
-      - name: Deploy Native Executable to EC2
-        run: |
-          scp -o StrictHostKeyChecking=no -i private_key.pem build/native/nativeCompile/* ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USER }}/app/
-          ssh -o StrictHostKeyChecking=no -i private_key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-            cd /home/${{ secrets.EC2_USER }}/app/
-            pkill -f shop-agent || true
-            chmod +x shop-agent
-            nohup ./shop-agent > app.log 2>&1 &
-            echo "앱 실행 완료"
-          EOF
+    # 👉 EC2 서버로 배포 시작
+    - name: Add SSH Key
+      run: |
+        echo "${{ secrets.EC2_SSH_KEY }}" > private_key.pem
+        chmod 600 private_key.pem
+
+    - name: Deploy to EC2
+      run: |
+        scp -o StrictHostKeyChecking=no -i private_key.pem build/libs/*.jar ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USER }}/app/
+        ssh -o StrictHostKeyChecking=no -i private_key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "bash /home/${{ secrets.EC2_USER }}/app/deploy.sh"
+
