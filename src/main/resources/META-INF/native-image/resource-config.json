@@ -27,7 +27,21 @@
       },
       {
         "pattern": "templates/.*"
+      },
+      {
+        "pattern": "\\Qorg/hibernate/validator/ValidationMessages.properties\\E"
+      },
+      {
+        "pattern": "\\Qorg/hibernate/validator/ValidationMessages_en.properties\\E"
       }
     ]
-  }
+  },
+  "bundles": [
+    {
+      "name": "org.hibernate.validator.ValidationMessages"
+    },
+    {
+      "name": "ValidationMessages"
+    }
+  ]
 }

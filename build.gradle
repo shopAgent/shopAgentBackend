@@ -11,19 +11,51 @@ version = '0.0.1-SNAPSHOT'
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
+        vendor = JvmVendorSpec.ORACLE
     }
 }
 
+configurations.all {
+    exclude group: 'commons-logging', module: 'commons-logging'
+}
+
 graalvmNative {
-    toolchainDetection = false
+    toolchainDetection = true
+
     binaries {
         main {
             imageName = 'shop-agent'
             buildArgs.add('--no-fallback')
             buildArgs.add('--report-unsupported-elements-at-runtime')
-            buildArgs.add('--initialize-at-build-time=org.apache.ibatis')
+
+            buildArgs.add('--initialize-at-run-time=org.apache.ibatis,org.mybatis,org.mybatis.spring')
+
+            // ↓ 로그/커넥터/네티/잭슨/커먼즈-로깅/SLF4J는 런타임 초기화
+            buildArgs.add('--initialize-at-run-time=ch.qos.logback')
+            buildArgs.add('--initialize-at-run-time=ch.qos.logback.classic')
+            buildArgs.add('--initialize-at-run-time=ch.qos.logback.core')
+            buildArgs.add('--initialize-at-run-time=org.slf4j,org.slf4j.helpers')
+            buildArgs.add('--initialize-at-run-time=org.apache.commons.logging')
             buildArgs.add('--initialize-at-run-time=com.zaxxer.hikari,com.mysql.cj,io.netty,com.fasterxml.jackson')
-            buildArgs.add('--initialize-at-build-time=org.slf4j')
+            
+            // ↓ Hibernate Validator와 JBoss 로깅 런타임 초기화
+            buildArgs.add('--initialize-at-run-time=org.hibernate.validator')
+            buildArgs.add('--initialize-at-run-time=org.jboss.logging')
+            buildArgs.add('--initialize-at-run-time=jakarta.validation')
+
+            buildArgs.add('-H:ClassInitialization=' +
+                    'org.slf4j.LoggerFactory:rerun,' +
+                    'org.slf4j.MarkerFactory:rerun,' +
+                    'org.slf4j.helpers.Reporter:rerun,' +
+                    'ch.qos.logback.classic.Logger:rerun,' +
+                    'ch.qos.logback.classic.Level:rerun,' +
+                    'ch.qos.logback.core.util.StatusPrinter:rerun,' +
+                    'ch.qos.logback.core.util.StatusPrinter2:rerun,' +
+                    'ch.qos.logback.core.util.Loader:rerun,' +
+                    'ch.qos.logback.core.status.StatusBase:rerun,' +
+                    'ch.qos.logback.core.status.InfoStatus:rerun'
+            )
+
             buildArgs.add('--enable-url-protocols=http,https')
             buildArgs.add('-H:+AddAllCharsets')
             buildArgs.add('-H:+UnlockExperimentalVMOptions')
@@ -35,16 +67,22 @@ graalvmNative {
     }
 }
 
+
+// 개발용 빠른 Native Image 빌드
+tasks.register('nativeCompileDev') {
+    group = 'native'
+    description = '빠른 개발용 Native Image 빌드'
+
+    dependsOn 'nativeCompile'
+
+    doLast {
+        println '개발용 Native Image 빌드 완료'
+    }
+}
+
 configurations {
     compileOnly {
         extendsFrom annotationProcessor
-    }
-    all {
-        exclude group: 'ch.qos.logback', module: 'logback-classic'
-        exclude group: 'ch.qos.logback', module: 'logback-core'
-        exclude group: 'org.apache.logging.log4j', module: 'log4j-to-slf4j'
-        exclude group: 'commons-logging', module: 'commons-logging'
-        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
     }
 }
 
@@ -55,11 +93,10 @@ repositories {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     
-    // Add SLF4J NOP to satisfy MyBatis dependency
-    implementation 'org.slf4j:slf4j-nop:2.0.7'
     
     compileOnly 'org.projectlombok:lombok'
-    runtimeOnly 'com.h2database:h2'
+
+    implementation "com.h2database:h2:2.2.224"
     annotationProcessor 'org.projectlombok:lombok'
     
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -71,6 +108,9 @@ dependencies {
     implementation 'org.reflections:reflections:0.10.2'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'com.google.genai:google-genai:1.0.0'
+
+    implementation 'ch.qos.logback:logback-classic'
+    implementation "org.javassist:javassist:3.29.2-GA"
 
 }
 

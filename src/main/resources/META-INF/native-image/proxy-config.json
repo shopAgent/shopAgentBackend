@@ -8,5 +8,15 @@
     "interfaces": [
       "org.spring.shopagent.mapper.ShopMapper"
     ]
+  },
+  {
+    "interfaces": [
+      "org.hibernate.validator.internal.util.logging.Messages"
+    ]
+  },
+  {
+    "interfaces": [
+      "org.hibernate.validator.internal.util.logging.Log"
+    ]
   }
 ]
