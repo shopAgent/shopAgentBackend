@@ -11,7 +11,7 @@ version = '0.0.1-SNAPSHOT'
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
-        vendor = JvmVendorSpec.ORACLE
+        // vendor = JvmVendorSpec.ORACLE  // GitHub Actions와 호환성을 위해 제거
     }
 }
 
