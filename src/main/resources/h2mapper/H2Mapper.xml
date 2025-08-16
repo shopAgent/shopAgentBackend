@@ -8,6 +8,51 @@
     <select id="selectNow" resultType="java.lang.String">
         SELECT NOW()
     </select>
+    
+    <!-- 테이블이 없으면 생성 -->
+    <update id="createTablesIfNotExists">
+        CREATE TABLE IF NOT EXISTS database_info (
+            id BIGINT AUTO_INCREMENT PRIMARY KEY,
+            ai_provider VARCHAR(255) DEFAULT '',
+            token VARCHAR(500) DEFAULT '',
+            database_type VARCHAR(50) DEFAULT '',
+            url VARCHAR(255) DEFAULT '',
+            db_name VARCHAR(255) DEFAULT '',
+            db_user_name VARCHAR(255) DEFAULT '',
+            db_password VARCHAR(255) DEFAULT '',
+            db_port INT DEFAULT 0,
+            user_name VARCHAR(255) DEFAULT '',
+            user_email VARCHAR(255) DEFAULT '',
+            create_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            update_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            data_type VARCHAR(50) DEFAULT ''
+        );
+        
+        CREATE TABLE IF NOT EXISTS search_config (
+            idx BIGINT AUTO_INCREMENT PRIMARY KEY,
+            type VARCHAR(50) DEFAULT '',
+            tool_name VARCHAR(255) DEFAULT '',
+            description TEXT DEFAULT '',
+            table_name VARCHAR(255) DEFAULT '',
+            product_name VARCHAR(255) DEFAULT '',
+            product_image VARCHAR(500) DEFAULT ''
+        );
+    </update>
+    
+    <!-- database_info 테이블 데이터 개수 조회 -->
+    <select id="countDatabaseInfo" resultType="int">
+        SELECT COUNT(*) FROM database_info
+    </select>
+    
+    <!-- 기본 빈 데이터 삽입 -->
+    <insert id="insertDefaultDatabaseInfo">
+        INSERT INTO database_info (
+            ai_provider, token, database_type, url, db_name, 
+            db_user_name, db_password, db_port, user_name, user_email
+        ) VALUES (
+            '', '', '', '', '', '', '', 0, '', ''
+        )
+    </insert>
 
     <update id="updateDatabaseInfo" parameterType="map">
         UPDATE database_info
@@ -20,6 +65,7 @@
         SELECT id, ai_provider, token, database_type, url, db_name, db_user_name, db_password, db_port,
                user_name, user_email, create_date, update_date, data_type
         FROM database_info
+        LIMIT 1
     </select>
 
     <update id="deleteDatabaseInfo">

@@ -11,6 +11,12 @@ import java.util.List;
 public interface H2Mapper {
 
     String selectNow();
+    
+    void createTablesIfNotExists();
+    
+    int countDatabaseInfo();
+    
+    void insertDefaultDatabaseInfo();
 
     void updateDatabaseInfo();
 

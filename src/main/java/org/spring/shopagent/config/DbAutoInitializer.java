@@ -23,10 +23,16 @@ public class DbAutoInitializer implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) {
         try {
+            // 1. H2 DB 테이블 자동 생성
+            initializeH2Database();
+            
+            // 2. 동적 MySQL 연결 시도
             DatabaseInfoDTO dbInfo = h2Mapper.selectDatabaseInfo();
 
             if (dbInfo == null || dbInfo.getUrl().isEmpty() || dbInfo.getDbUserName().isEmpty() || dbInfo.getDbPassword().isEmpty()) {
-                throw new CustomException(ErrorType.DB_CONFIG_NOT_FOUND);
+                System.out.println("⚠️ MySQL 연결 정보가 설정되지 않았습니다. H2 Console에서 설정하세요.");
+                dbConnected = false;
+                return;
             }
 
             String url = dynamicDatabaseService.createDBJdbcUrl(
@@ -36,8 +42,34 @@ public class DbAutoInitializer implements ApplicationRunner {
                     dbInfo.getDbPort());
 
             dbConnected = dynamicDatabaseService.initializeDatabase(url, dbInfo.getDbUserName(), dbInfo.getDbPassword(), true);
+            System.out.println("✅ MySQL 동적 연결 성공!");
+            
         } catch (Exception e) {
-
+            System.err.println("❌ 데이터베이스 초기화 실패: " + e.getMessage());
+            dbConnected = false;
+        }
+    }
+    
+    private void initializeH2Database() {
+        try {
+            System.out.println("=== H2 DB 초기화 시작 ===");
+            
+            // 1. 테이블 생성 (없으면)
+            h2Mapper.createTablesIfNotExists();
+            System.out.println("✅ H2 테이블 생성 완료");
+            
+            // 2. database_info 테이블에 데이터가 없으면 기본값 삽입
+            int dataCount = h2Mapper.countDatabaseInfo();
+            if (dataCount == 0) {
+                h2Mapper.insertDefaultDatabaseInfo();
+                System.out.println("✅ H2 기본 데이터 삽입 완료");
+            } else {
+                System.out.println("✅ H2 기존 데이터 존재: " + dataCount + "개");
+            }
+            
+        } catch (Exception e) {
+            System.err.println("❌ H2 DB 초기화 실패: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
