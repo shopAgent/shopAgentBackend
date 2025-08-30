@@ -196,14 +196,14 @@ public class SettingService {
 
     }
 
-    public ApiResponseDto<List<String>> getTableList() {
+    public ApiResponseDto<List<TableInfoResponseDTO>> getTableList() {
 
         DbAutoInitializer.isDbConnectedThrow();
 
         ShopMapper shopMapper = shopMapperProvider.get();
-        List<String> tableList = shopMapper.selectTableList();
+        List<TableInfoResponseDTO> tableInfoList = shopMapper.selectTableInfoList();
 
-        return ResponseUtils.ok(MsgType.DATA_SELECT_SUCCESS, tableList);
+        return ResponseUtils.ok(MsgType.DATA_SELECT_SUCCESS, tableInfoList);
 
     }
 
@@ -215,6 +215,16 @@ public class SettingService {
         List<TableColumnResponseDTO> columns = shopMapper.selectTableColumns(tableName);
 
         return ResponseUtils.ok(MsgType.DATA_SELECT_SUCCESS, columns);
+
+    }
+
+    public ApiResponseDto<List<SearchRequestDTO>> getSearchConfigList() {
+
+        DbAutoInitializer.isDbConnectedThrow();
+
+        List<SearchRequestDTO> searchConfigList = h2Mapper.selectSearchConfigListOrderByUpdateDate();
+
+        return ResponseUtils.ok(MsgType.DATA_SELECT_SUCCESS, searchConfigList);
 
     }
 }

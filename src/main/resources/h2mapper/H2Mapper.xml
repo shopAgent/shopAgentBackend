@@ -35,8 +35,16 @@
             description TEXT DEFAULT '',
             table_name VARCHAR(255) DEFAULT '',
             product_name VARCHAR(255) DEFAULT '',
-            product_image VARCHAR(500) DEFAULT ''
+            product_image VARCHAR(500) DEFAULT '',
+            create_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            update_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
         );
+    </update>
+    
+    <!-- 기존 테이블에 컬럼 추가 (없을 경우에만) -->
+    <update id="addMissingColumnsToSearchConfig">
+        ALTER TABLE search_config ADD COLUMN IF NOT EXISTS create_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+        ALTER TABLE search_config ADD COLUMN IF NOT EXISTS update_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
     </update>
     
     <!-- database_info 테이블 데이터 개수 조회 -->
@@ -97,9 +105,17 @@
     <update id="updateSearchConfig" parameterType="map">
         UPDATE search_config
         SET tool_name = #{toolName}, description = #{description}, table_name = #{tableName}, 
-            product_name = #{productName}, product_image = #{productImage}
+            product_name = #{productName}, product_image = #{productImage}, 
+            update_date = CURRENT_TIMESTAMP
         WHERE idx = #{idxSearchConfig}
     </update>
+
+    <select id="selectSearchConfigListOrderByUpdateDate" resultType="org.spring.shopagent.setting.dto.SearchRequestDTO">
+        SELECT idx AS idxSearchConfig, tool_name AS toolName, description, table_name AS tableName,
+               product_name AS productName, product_image AS productImage
+        FROM search_config
+        ORDER BY update_date DESC
+    </select>
 
 </mapper>
 

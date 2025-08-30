@@ -15,7 +15,7 @@ public class ChatController {
     private final ChatService chatService;
 
     @PostMapping("/api/chat")
-    public ApiResponseDto<java.util.List<java.util.Map<String, Object>>> getChat(
+    public ApiResponseDto<Object> getChat(
             @RequestBody @Valid ChatRequestDTO dto
     ) {
         return chatService.getChat(dto);

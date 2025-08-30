@@ -58,6 +58,10 @@ public class DbAutoInitializer implements ApplicationRunner {
             h2Mapper.createTablesIfNotExists();
             System.out.println("✅ H2 테이블 생성 완료");
             
+            // 1.1 기존 테이블에 누락된 컬럼 추가 (있으면)
+            h2Mapper.addMissingColumnsToSearchConfig();
+            System.out.println("✅ H2 테이블 스키마 업데이트 완료");
+            
             // 2. database_info 테이블에 데이터가 없으면 기본값 삽입
             int dataCount = h2Mapper.countDatabaseInfo();
             if (dataCount == 0) {

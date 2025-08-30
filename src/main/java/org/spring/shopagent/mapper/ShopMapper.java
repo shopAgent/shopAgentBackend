@@ -3,6 +3,7 @@ package org.spring.shopagent.mapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.spring.shopagent.setting.dto.TableColumnResponseDTO;
+import org.spring.shopagent.setting.dto.TableInfoResponseDTO;
 
 import java.util.List;
 import java.util.Map;
@@ -23,5 +24,7 @@ public interface ShopMapper {
     List<String> selectTableList();
 
     List<TableColumnResponseDTO> selectTableColumns(String tableName);
+
+    List<TableInfoResponseDTO> selectTableInfoList();
 
 }

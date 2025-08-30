@@ -58,6 +58,11 @@ public class SettingController {
         return settingService.getSearchConfig(idxSearchConfig);
     }
 
+    @GetMapping("/api/config/search")
+    public ApiResponseDto<List<SearchRequestDTO>> getSearchConfigList() {
+        return settingService.getSearchConfigList();
+    }
+
     @PutMapping("/api/config/search/{idxSearchConfig}")
     public ApiResponseDto<Void> updateSearchConfig(
             @RequestBody @Valid SearchRequestDTO dto,
@@ -67,7 +72,7 @@ public class SettingController {
     }
 
     @GetMapping("/api/config/tables")
-    public ApiResponseDto<List<String>> getTableList() {
+    public ApiResponseDto<List<TableInfoResponseDTO>> getTableList() {
         return settingService.getTableList();
     }
 

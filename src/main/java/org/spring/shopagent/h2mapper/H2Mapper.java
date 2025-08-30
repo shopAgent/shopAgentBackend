@@ -14,6 +14,8 @@ public interface H2Mapper {
     
     void createTablesIfNotExists();
     
+    void addMissingColumnsToSearchConfig();
+    
     int countDatabaseInfo();
     
     void insertDefaultDatabaseInfo();
@@ -33,4 +35,6 @@ public interface H2Mapper {
     List<SearchRequestDTO> selectSearchConfigByType(String type);
 
     int updateSearchConfig(SearchRequestDTO dto);
+
+    List<SearchRequestDTO> selectSearchConfigListOrderByUpdateDate();
 }
