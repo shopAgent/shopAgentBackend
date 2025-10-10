@@ -37,9 +37,11 @@ jobs:
 
     - name: Build React App
       working-directory: ${{ env.REACT_BUILD_DIR }}
+      env:
+        CI: false
       run: |
         npm install
-        CI=false npm run build
+        npm run build
 
     - name: Copy React Build to Spring Boot Static Resources
       shell: bash
