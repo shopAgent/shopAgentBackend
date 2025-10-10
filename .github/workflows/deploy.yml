@@ -10,8 +10,22 @@ env:
   SPRING_STATIC_PATH: src/main/resources/static
 
 jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
+  build-native:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            executable: shop-agent
+            artifact-name: shop-agent-linux-amd64
+          - os: windows-latest
+            executable: shop-agent.exe
+            artifact-name: shop-agent-windows-amd64.exe
+          - os: macos-latest
+            executable: shop-agent
+            artifact-name: shop-agent-macos-arm64
+
+    runs-on: ${{ matrix.os }}
 
     steps:
     - name: Checkout Spring Boot Repository
@@ -21,32 +35,18 @@ jobs:
       run: |
         git clone https://x-access-token:${{ secrets.REACT_REPO_TOKEN }}@github.com/${{ env.REACT_REPO }} ${{ env.REACT_BUILD_DIR }}
 
-    - name: Build React App (Lint 무시) (임시)
+    - name: Build React App
       working-directory: ${{ env.REACT_BUILD_DIR }}
       run: |
         npm install
         CI=false npm run build
 
-    - name: Print React Build Output
-      run: |
-        echo "✅ React Build 결과 확인"
-        ls -al frontend-build/build/
-        ls -al frontend-build/build/static || true
-        cat frontend-build/build/index.html | head -n 5
-
     - name: Copy React Build to Spring Boot Static Resources
+      shell: bash
       run: |
         mkdir -p src/main/resources/static
         rm -rf src/main/resources/static/*
         cp -r frontend-build/build/* src/main/resources/static/
-
-    - name: Print Spring static/ 복사 결과
-      run: |
-        echo "✅ Spring static/ 폴더에 복사된 결과"
-        ls -al src/main/resources/static/
-        ls -al src/main/resources/static/static || true
-        cat src/main/resources/static/index.html | head -n 5
-
 
     - name: Set up GraalVM JDK 21
       uses: graalvm/setup-graalvm@v1
@@ -55,30 +55,58 @@ jobs:
         distribution: 'graalvm'
         github-token: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Print current directory structure
-      run: |
-        pwd
-        ls -al
-        java -version
-        native-image --version
+    - name: Grant execute permission for gradlew (Linux/macOS)
+      if: runner.os != 'Windows'
+      run: chmod +x gradlew
 
     - name: Build Native Image
       run: ./gradlew nativeCompile
 
     - name: Check native image build result
+      shell: bash
       run: |
-        echo "✅ 네이티브 이미지 빌드 결과"
+        echo "✅ 네이티브 이미지 빌드 결과 for ${{ matrix.os }}"
         ls -al build/native/nativeCompile/
-        file build/native/nativeCompile/shop-agent
+        file build/native/nativeCompile/${{ matrix.executable }} || true
 
-    # 👉 EC2 서버로 배포 시작
+    - name: Upload Native Image Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ matrix.artifact-name }}
+        path: build/native/nativeCompile/${{ matrix.executable }}
+
+  deploy:
+    needs: build-native
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v3
+      with:
+        path: artifacts
+
+    - name: Display downloaded files
+      run: |
+        echo "✅ 다운로드된 모든 네이티브 이미지"
+        ls -R artifacts/
+
     - name: Add SSH Key
       run: |
         echo "${{ secrets.EC2_SSH_KEY }}" > private_key.pem
         chmod 600 private_key.pem
 
-    - name: Deploy Native Image to EC2
+    - name: Deploy all Native Images to EC2
       run: |
-        scp -o StrictHostKeyChecking=no -i private_key.pem build/native/nativeCompile/shop-agent ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USER }}/app/
+        # Linux 버전 (실행용)
+        scp -o StrictHostKeyChecking=no -i private_key.pem artifacts/shop-agent-linux-amd64/shop-agent ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USER }}/app/
+
+        # 다운로드용 디렉토리 생성 및 모든 버전 업로드
+        ssh -o StrictHostKeyChecking=no -i private_key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "mkdir -p /home/${{ secrets.EC2_USER }}/app/downloads"
+
+        scp -o StrictHostKeyChecking=no -i private_key.pem artifacts/shop-agent-linux-amd64/shop-agent ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USER }}/app/downloads/shop-agent-linux-amd64
+        scp -o StrictHostKeyChecking=no -i private_key.pem artifacts/shop-agent-windows-amd64.exe/shop-agent.exe ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USER }}/app/downloads/shop-agent-windows-amd64.exe
+        scp -o StrictHostKeyChecking=no -i private_key.pem artifacts/shop-agent-macos-arm64/shop-agent ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USER }}/app/downloads/shop-agent-macos-arm64
+
+        # 실행 권한 부여 및 배포 스크립트 실행
         ssh -o StrictHostKeyChecking=no -i private_key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "chmod +x /home/${{ secrets.EC2_USER }}/app/shop-agent && bash /home/${{ secrets.EC2_USER }}/app/deploy.sh"
 
