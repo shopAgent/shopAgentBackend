@@ -9,6 +9,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import javax.sql.DataSource;
 
@@ -58,21 +59,21 @@ public class DynamicDataSourceConfig {
             }
             System.out.println("=== Direct JDBC Connection Test Complete ===");
 
-            HikariConfig config = new HikariConfig();
-            config.setJdbcUrl(url);
-            config.setUsername(username);
-            config.setPassword(password != null ? "***" : "null");
-            config.setDriverClassName("com.mysql.cj.jdbc.Driver");
+            // HikariCP는 GraalVM Native Image에서 문제가 있으므로 DriverManagerDataSource 사용
+            System.out.println("Creating DriverManagerDataSource (bypassing HikariCP due to Native Image compatibility)...");
+            DriverManagerDataSource driverManagerDataSource = new DriverManagerDataSource();
+            driverManagerDataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
+            driverManagerDataSource.setUrl(url);
+            driverManagerDataSource.setUsername(username);
+            driverManagerDataSource.setPassword(password);
 
-            System.out.println("HikariConfig details:");
+            System.out.println("DriverManagerDataSource details:");
             System.out.println("  - JDBC URL: " + url);
             System.out.println("  - Username: " + username);
             System.out.println("  - Driver: com.mysql.cj.jdbc.Driver");
 
-            System.out.println("Creating HikariDataSource (this will test the connection)...");
-            config.setPassword(password); // Restore actual password
-            DataSource dataSource = new HikariDataSource(config);
-            System.out.println("HikariDataSource created successfully!");
+            DataSource dataSource = driverManagerDataSource;
+            System.out.println("DriverManagerDataSource created successfully!");
 
             System.out.println("Creating SqlSessionFactory...");
             SqlSessionFactoryBean sessionFactoryBean = new SqlSessionFactoryBean();
