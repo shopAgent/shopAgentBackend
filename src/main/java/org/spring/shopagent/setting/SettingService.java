@@ -38,16 +38,37 @@ public class SettingService {
     @Transactional
     public ApiResponseDto<DbConfigRequestDTO> insertDbConfig(@RequestBody DbConfigRequestDTO dto) {
         try {
+            System.out.println("=== insertDbConfig START ===");
+            System.out.println("Request DTO: " + dto);
+
+            System.out.println("Step 1: Creating JDBC URL...");
             String url = dynamicDatabaseService.createDBJdbcUrl(dto.getDatabaseType(), dto.getDbName(), dto.getUrl(), dto.getDbPort());
+            System.out.println("Created JDBC URL: " + url);
 
+            System.out.println("Step 2: Initializing database connection...");
             boolean success = dynamicDatabaseService.initializeDatabase(url, dto.getDbUserName(), dto.getDbPassword(), true);
+            System.out.println("Database initialization result: " + success);
 
+            System.out.println("Step 3: Updating H2 database info...");
             h2Mapper.updateDatabaseInfo(dto);
+            System.out.println("H2 database info updated successfully");
 
-            if (!success)
+            if (!success) {
+                System.err.println("ERROR: Database initialization failed");
                 throw new CustomException(ErrorType.DB_CONNECTION_ERROR);
+            }
 
+            System.out.println("=== insertDbConfig SUCCESS ===");
+        } catch (CustomException e) {
+            System.err.println("=== insertDbConfig FAILED (CustomException) ===");
+            System.err.println("Error Type: " + e.getErrorType());
+            System.err.println("Error Message: " + e.getMessage());
+            throw e;
         } catch (Exception e) {
+            System.err.println("=== insertDbConfig FAILED (Exception) ===");
+            System.err.println("Exception Type: " + e.getClass().getName());
+            System.err.println("Exception Message: " + e.getMessage());
+            e.printStackTrace();
             throw new CustomException(ErrorType.DB_CONNECTION_ERROR);
         }
         return ResponseUtils.ok(MsgType.DB_CONNECTION_SUCCESS, dto);
