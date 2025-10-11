@@ -36,6 +36,12 @@
       },
       {
         "pattern": "\\QMETA-INF/services/java.sql.Driver\\E"
+      },
+      {
+        "pattern": "\\Qcom/mysql/cj/LocalizedErrorMessages.properties\\E"
+      },
+      {
+        "pattern": "\\Qcom/mysql/cj/TlsSettings.properties\\E"
       }
     ]
   },
@@ -45,6 +51,9 @@
     },
     {
       "name": "ValidationMessages"
+    },
+    {
+      "name": "com.mysql.cj.LocalizedErrorMessages"
     }
   ]
 }
