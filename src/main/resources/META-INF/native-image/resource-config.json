@@ -33,6 +33,9 @@
       },
       {
         "pattern": "\\Qorg/hibernate/validator/ValidationMessages_en.properties\\E"
+      },
+      {
+        "pattern": "\\QMETA-INF/services/java.sql.Driver\\E"
       }
     ]
   },

@@ -2,7 +2,10 @@
   { "name": "org.h2.Driver", "allDeclaredConstructors": true, "allDeclaredMethods": true },
   { "name": "com.mysql.cj.jdbc.Driver", "allDeclaredConstructors": true, "allDeclaredMethods": true },
   { "name": "com.mysql.cj.jdbc.NonRegisteringDriver", "allDeclaredConstructors": true, "allDeclaredMethods": true },
+  { "name": "com.mysql.cj.jdbc.MysqlDataSource", "allDeclaredConstructors": true, "allDeclaredMethods": true, "allDeclaredFields": true },
+  { "name": "com.mysql.cj.jdbc.MysqlConnectionPoolDataSource", "allDeclaredConstructors": true, "allDeclaredMethods": true },
   { "name": "com.mysql.cj.conf.url.SingleConnectionUrl", "allDeclaredConstructors": true },
+  { "name": "com.mysql.cj.conf.PropertyKey", "allDeclaredFields": true },
   { "name": "org.apache.ibatis.logging.stdout.StdOutImpl",
     "queriedMethods": [{ "name": "<init>", "parameterTypes": ["java.lang.String"] }]
   },
