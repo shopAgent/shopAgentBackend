@@ -28,25 +28,44 @@ public class DynamicDatabaseService {
 
         public boolean initializeDatabase(String url, String username, String password, boolean testQuery) {
             try {
-                DataSource dataSource = dynamicDataSourceConfig.initialize(url, username, password, ctx);
+                System.out.println("=== initializeDatabase START ===");
+                System.out.println("URL: " + url);
+                System.out.println("Username: " + username);
+                System.out.println("Password: " + (password != null ? "***" : "null"));
+                System.out.println("Test Query: " + testQuery);
 
+                System.out.println("Step 1: Initializing DataSource...");
+                DataSource dataSource = dynamicDataSourceConfig.initialize(url, username, password, ctx);
+                System.out.println("DataSource initialized: " + dataSource.getClass().getName());
+
+                System.out.println("Step 2: Creating SqlSessionFactory...");
                 SqlSessionFactoryBean factoryBean = new SqlSessionFactoryBean();
                 factoryBean.setDataSource(dataSource);
                 factoryBean.setMapperLocations(
                         new PathMatchingResourcePatternResolver().getResources("classpath:/mapper/**/*.xml"));
                 SqlSessionFactory sqlSessionFactory = factoryBean.getObject();
+                System.out.println("SqlSessionFactory created successfully");
 
+                System.out.println("Step 3: Registering Mappers...");
                 dynamicMapperRegistrar.registerMappers("org.spring.shopagent.mapper", sqlSessionFactory, ctx);
                 System.out.println("Mapper 등록 완료");
 
                 if (testQuery) {
+                    System.out.println("Step 4: Running test query...");
                     ShopMapper shopMapper = ctx.getBean(ShopMapper.class);
-                    System.out.println("Test Query 결과: " + shopMapper.selectNow());
+                    String testResult = shopMapper.selectNow();
+                    System.out.println("Test Query 결과: " + testResult);
                 }
 
+                System.out.println("=== initializeDatabase SUCCESS ===");
                 return true;
 
             } catch (Exception e) {
+                System.err.println("=== initializeDatabase FAILED ===");
+                System.err.println("Exception Type: " + e.getClass().getName());
+                System.err.println("Exception Message: " + e.getMessage());
+                System.err.println("Root Cause: " + (e.getCause() != null ? e.getCause().getMessage() : "null"));
+                e.printStackTrace();
                 throw new CustomException(ErrorType.DB_CONNECTION_ERROR, e.getMessage());
             }
         }
@@ -79,11 +98,11 @@ public class DynamicDatabaseService {
 
     public String createDBJdbcUrl(String databaseType, String dbName, String url, Integer dbPort) {
 
-        return switch (databaseType) {
-            case "MySQL" -> url = "jdbc:mysql://" + url + ":" + dbPort + "/" + dbName;
-            case "MSSQL" -> url = "jdbc:sqlserver://" + url + ":" + dbPort + ";databaseName=" + dbName;
-            case "PostgreSQL" -> url = "jdbc:postgresql://" + url + ":" + dbPort + "/" + dbName;
-            case "SQLite" -> url = "jdbc:sqlite:" + dbName;
+        return switch (databaseType.toLowerCase()) {
+            case "mysql" -> "jdbc:mysql://" + url + ":" + dbPort + "/" + dbName;
+            case "mssql" -> "jdbc:sqlserver://" + url + ":" + dbPort + ";databaseName=" + dbName;
+            case "postgresql" -> "jdbc:postgresql://" + url + ":" + dbPort + "/" + dbName;
+            case "sqlite" -> "jdbc:sqlite:" + dbName;
             default -> throw new CustomException(ErrorType.DB_CONNECTION_ERROR);
         };
     }
