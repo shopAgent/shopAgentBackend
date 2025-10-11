@@ -24,6 +24,18 @@ public class DynamicDataSourceConfig {
             System.out.println("=== DynamicDataSourceConfig.initialize START ===");
 
             System.out.println("Creating HikariConfig...");
+
+            // JDBC 드라이버 로드 테스트
+            try {
+                System.out.println("Testing JDBC driver loading...");
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                System.out.println("JDBC driver loaded successfully!");
+            } catch (ClassNotFoundException e) {
+                System.err.println("FATAL: MySQL JDBC Driver not found!");
+                System.err.println("This is likely a GraalVM Native Image configuration issue.");
+                throw new RuntimeException("MySQL JDBC Driver not available", e);
+            }
+
             HikariConfig config = new HikariConfig();
             config.setJdbcUrl(url);
             config.setUsername(username);
