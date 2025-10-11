@@ -13,17 +13,17 @@ jobs:
   build-native:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest] # , windows-latest, macos-latest
         include:
           - os: ubuntu-latest
             executable: shop-agent
             artifact-name: shop-agent-linux-amd64
-          - os: windows-latest
-            executable: shop-agent.exe
-            artifact-name: shop-agent-windows-amd64.exe
-          - os: macos-latest
-            executable: shop-agent
-            artifact-name: shop-agent-macos-arm64
+          # - os: windows-latest
+          #   executable: shop-agent.exe
+          #   artifact-name: shop-agent-windows-amd64.exe
+          # - os: macos-latest
+          #   executable: shop-agent
+          #   artifact-name: shop-agent-macos-arm64
 
     runs-on: ${{ matrix.os }}
 
@@ -97,17 +97,17 @@ jobs:
         echo "${{ secrets.EC2_SSH_KEY }}" > private_key.pem
         chmod 600 private_key.pem
 
-    - name: Deploy all Native Images to EC2
+    - name: Deploy Linux Native Image to EC2
       run: |
         # Linux 버전 (실행용)
         scp -o StrictHostKeyChecking=no -i private_key.pem artifacts/shop-agent-linux-amd64/shop-agent ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USER }}/app/
 
-        # 다운로드용 디렉토리 생성 및 모든 버전 업로드
+        # 다운로드용 디렉토리 생성 및 Linux 버전 업로드
         ssh -o StrictHostKeyChecking=no -i private_key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "mkdir -p /home/${{ secrets.EC2_USER }}/app/downloads"
 
         scp -o StrictHostKeyChecking=no -i private_key.pem artifacts/shop-agent-linux-amd64/shop-agent ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USER }}/app/downloads/shop-agent-linux-amd64
-        scp -o StrictHostKeyChecking=no -i private_key.pem artifacts/shop-agent-windows-amd64.exe/shop-agent.exe ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USER }}/app/downloads/shop-agent-windows-amd64.exe
-        scp -o StrictHostKeyChecking=no -i private_key.pem artifacts/shop-agent-macos-arm64/shop-agent ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USER }}/app/downloads/shop-agent-macos-arm64
+        # scp -o StrictHostKeyChecking=no -i private_key.pem artifacts/shop-agent-windows-amd64.exe/shop-agent.exe ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USER }}/app/downloads/shop-agent-windows-amd64.exe
+        # scp -o StrictHostKeyChecking=no -i private_key.pem artifacts/shop-agent-macos-arm64/shop-agent ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USER }}/app/downloads/shop-agent-macos-arm64
 
         # 실행 권한 부여 및 배포 스크립트 실행
         ssh -o StrictHostKeyChecking=no -i private_key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "chmod +x /home/${{ secrets.EC2_USER }}/app/shop-agent && bash /home/${{ secrets.EC2_USER }}/app/deploy.sh"
