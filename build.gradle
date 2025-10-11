@@ -37,6 +37,8 @@ graalvmNative {
             buildArgs.add('--initialize-at-run-time=org.slf4j,org.slf4j.helpers')
             buildArgs.add('--initialize-at-run-time=org.apache.commons.logging')
             buildArgs.add('--initialize-at-run-time=com.zaxxer.hikari,com.mysql.cj,io.netty,com.fasterxml.jackson')
+            buildArgs.add('--initialize-at-run-time=java.sql.DriverManager')
+            buildArgs.add('--initialize-at-run-time=java.sql.Driver')
             
             // ↓ Hibernate Validator와 JBoss 로깅 런타임 초기화
             buildArgs.add('--initialize-at-run-time=org.hibernate.validator')

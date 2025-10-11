@@ -20,7 +20,7 @@ import java.time.format.DateTimeFormatter;
 })
 public class ShopAgentApplication {
 
-    private static final String BUILD_VERSION = "2025-10-12T00:00:00+09:00[Asia/Seoul]";
+    private static final String BUILD_VERSION = "2025-10-11T16:51:38+09:00[Asia/Seoul]";
 
     public static void main(String[] args) {
         SpringApplication.run(ShopAgentApplication.class, args);
