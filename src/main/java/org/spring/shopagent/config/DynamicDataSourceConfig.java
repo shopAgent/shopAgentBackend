@@ -36,6 +36,28 @@ public class DynamicDataSourceConfig {
                 throw new RuntimeException("MySQL JDBC Driver not available", e);
             }
 
+            // DriverManager를 사용한 직접 연결 테스트
+            System.out.println("=== Testing Direct JDBC Connection ===");
+            try {
+                System.out.println("Attempting DriverManager.getConnection()...");
+                java.sql.Connection testConn = java.sql.DriverManager.getConnection(url, username, password);
+                if (testConn == null) {
+                    System.err.println("ERROR: DriverManager.getConnection() returned NULL!");
+                } else {
+                    System.out.println("SUCCESS: Direct JDBC connection established!");
+                    System.out.println("Connection class: " + testConn.getClass().getName());
+                    System.out.println("Connection valid: " + testConn.isValid(5));
+                    testConn.close();
+                    System.out.println("Test connection closed successfully");
+                }
+            } catch (Exception e) {
+                System.err.println("ERROR: Direct JDBC connection failed!");
+                System.err.println("Error type: " + e.getClass().getName());
+                System.err.println("Error message: " + e.getMessage());
+                e.printStackTrace();
+            }
+            System.out.println("=== Direct JDBC Connection Test Complete ===");
+
             HikariConfig config = new HikariConfig();
             config.setJdbcUrl(url);
             config.setUsername(username);
