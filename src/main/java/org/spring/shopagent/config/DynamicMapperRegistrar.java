@@ -8,8 +8,11 @@
     import org.springframework.context.ApplicationContext;
     import org.springframework.context.ConfigurableApplicationContext;
     import org.springframework.stereotype.Component;
+    import org.spring.shopagent.mapper.ShopMapper;
 
     import java.beans.Introspector;
+    import java.util.ArrayList;
+    import java.util.List;
     import java.util.Set;
 
     @Component
@@ -19,17 +22,17 @@
             ConfigurableListableBeanFactory beanFactory =
                     ((ConfigurableApplicationContext) ctx).getBeanFactory();
 
-            System.out.println("Mapper 스캔");
-            Reflections reflections = new Reflections(basePackage);
-            Set<Class<?>> mappers = reflections.getTypesAnnotatedWith(Mapper.class);
+            // GraalVM Native Image에서 Reflections 라이브러리가 작동하지 않으므로 수동 등록
+            System.out.println("Registering mappers manually for Native Image compatibility");
 
-            if (mappers.isEmpty()) {
-                System.out.println("Mapper 없음: " + basePackage);
-            }
+            List<Class<?>> mappers = new ArrayList<>();
+            mappers.add(ShopMapper.class);
+
+            System.out.println("Found " + mappers.size() + " mapper(s) to register");
 
             for (Class<?> mapperClass : mappers) {
                 try {
-                    System.out.println("Mapper 등록: " + mapperClass.getName());
+                    System.out.println("Registering mapper: " + mapperClass.getName());
 
                     MapperFactoryBean<?> factoryBean = new MapperFactoryBean<>(mapperClass);
                     factoryBean.setSqlSessionFactory(sqlSessionFactory);
@@ -38,11 +41,13 @@
                     String beanName = Introspector.decapitalize(mapperClass.getSimpleName());
                     if (!beanFactory.containsBean(beanName)) {
                         beanFactory.registerSingleton(beanName, factoryBean.getObject());
-                        System.out.println("Mapper 등록: " + beanName);
+                        System.out.println("✅ Mapper registered successfully: " + beanName);
                     }
 
                 } catch (Exception e) {
-                    System.err.println("Mapper 등록 실패: " + e.getMessage());
+                    System.err.println("❌ Mapper registration failed: " + mapperClass.getName());
+                    System.err.println("Error: " + e.getMessage());
+                    e.printStackTrace();
                 }
             }
         }
