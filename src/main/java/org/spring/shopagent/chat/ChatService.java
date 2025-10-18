@@ -72,19 +72,51 @@ public class ChatService {
             throw new CustomException(ErrorType.DATA_NOT_FOUND, "상품 검색 설정이 없습니다.");
         }
 
-        String prompt = buildSqlPrompt(productConfigs, dto.getMessage());
-        String sqlQuery = aiClientCallService.callAiClient(prompt);
-        
-        sqlQuery = extractSqlFromResponse(sqlQuery);
+        int maxRetries = 2;
+        String lastError = null;
+        String lastQuery = null;
 
-        try {
-            List<java.util.Map<String, Object>> queryResult = shopMapper.executeDynamicQuery(sqlQuery);
-            return ResponseUtils.ok(MsgType.DATA_SELECT_SUCCESS, queryResult);
-        } catch (Exception e) {
-            throw new CustomException(ErrorType.DB_CONNECTION_ERROR, 
-                "SQL 쿼리 실행 중 오류가 발생했습니다. DB 연결 정보를 확인해주세요. " +
-                "생성된 쿼리: " + sqlQuery + " | 오류: " + e.getMessage());
+        for (int attempt = 0; attempt <= maxRetries; attempt++) {
+            try {
+                String prompt = buildSqlPrompt(productConfigs, dto.getMessage(), lastQuery, lastError, attempt);
+                String sqlQuery = aiClientCallService.callAiClient(prompt);
+
+                sqlQuery = extractSqlFromResponse(sqlQuery);
+                lastQuery = sqlQuery;
+
+                System.out.println("=== SQL Query Attempt " + (attempt + 1) + " ===");
+                System.out.println(sqlQuery);
+
+                List<java.util.Map<String, Object>> queryResult = shopMapper.executeDynamicQuery(sqlQuery);
+
+                if (attempt > 0) {
+                    System.out.println("✅ Query succeeded after " + (attempt + 1) + " attempts");
+                }
+
+                return ResponseUtils.ok(MsgType.DATA_SELECT_SUCCESS, queryResult);
+
+            } catch (Exception e) {
+                lastError = e.getMessage();
+                System.err.println("❌ SQL Query Attempt " + (attempt + 1) + " failed: " + lastError);
+
+                if (attempt == maxRetries) {
+                    // 마지막 재시도도 실패한 경우
+                    throw new CustomException(ErrorType.DB_CONNECTION_ERROR,
+                        "SQL 쿼리 실행 중 오류가 발생했습니다. " + (maxRetries + 1) + "번 시도 후 실패했습니다. " +
+                        "마지막 쿼리: " + lastQuery + " | 오류: " + lastError);
+                }
+
+                // 재시도 전 잠시 대기
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
+            }
         }
+
+        // 이 코드는 도달하지 않지만 컴파일러를 위해 추가
+        throw new CustomException(ErrorType.DB_CONNECTION_ERROR, "쿼리 실행 실패");
     }
 
     private ApiResponseDto<Object> handleGeneralChat(ChatRequestDTO dto) {
@@ -97,10 +129,21 @@ public class ChatService {
         return ResponseUtils.ok(MsgType.DATA_SELECT_SUCCESS, aiResponse);
     }
 
-    private String buildSqlPrompt(List<SearchRequestDTO> configs, String userMessage) {
+    private String buildSqlPrompt(List<SearchRequestDTO> configs, String userMessage,
+                                   String previousQuery, String previousError, int attemptNumber) {
         StringBuilder prompt = new StringBuilder();
+
+        if (attemptNumber > 0 && previousQuery != null && previousError != null) {
+            // 재시도인 경우 이전 쿼리와 오류 정보 포함
+            prompt.append("⚠️ RETRY ATTEMPT #").append(attemptNumber + 1).append("\n");
+            prompt.append("The previous SQL query failed with an error. Please generate a CORRECTED query.\n\n");
+            prompt.append("Previous Failed Query:\n").append(previousQuery).append("\n\n");
+            prompt.append("Error Message:\n").append(previousError).append("\n\n");
+            prompt.append("Please analyze the error and generate a corrected SQL query that fixes the issue.\n\n");
+        }
+
         prompt.append("Based on the following database schema and user request, generate ONLY a SQL query (no explanations):\n\n");
-        
+
         prompt.append("Available tables and their descriptions:\n");
         for (SearchRequestDTO config : configs) {
             prompt.append("- Table: ").append(config.getTableName()).append("\n");
@@ -109,10 +152,10 @@ public class ChatService {
             prompt.append("  Product Name Column: ").append(config.getProductName()).append("\n");
             prompt.append("  Product Image Column: ").append(config.getProductImage()).append("\n\n");
         }
-        
+
         prompt.append("User Request: ").append(userMessage).append("\n\n");
         prompt.append("Generate a SQL SELECT query to fulfill this request. Return ONLY the SQL query without any markdown formatting or explanations.");
-        
+
         return prompt.toString();
     }
 
