@@ -62,5 +62,11 @@
   { "name": "org.apache.ibatis.plugin.Signature", "allDeclaredConstructors": true, "allDeclaredMethods": true },
   { "name": "org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration", "allDeclaredConstructors": true, "allDeclaredMethods": true },
   { "name": "org.apache.ibatis.session.SqlSessionFactory", "allDeclaredConstructors": true, "allDeclaredMethods": true },
-  { "name": "org.apache.ibatis.session.Configuration", "allDeclaredConstructors": true, "allDeclaredMethods": true }
+  { "name": "org.apache.ibatis.session.Configuration", "allDeclaredConstructors": true, "allDeclaredMethods": true },
+  { "name": "com.google.genai.Client", "allDeclaredConstructors": true, "allDeclaredMethods": true, "allDeclaredFields": true },
+  { "name": "com.google.genai.HttpApiClient", "allDeclaredConstructors": true, "allDeclaredMethods": true, "allDeclaredFields": true },
+  { "name": "com.google.genai.Models", "allDeclaredConstructors": true, "allDeclaredMethods": true, "allDeclaredFields": true },
+  { "name": "com.google.genai.types.GenerateContentResponse", "allDeclaredConstructors": true, "allDeclaredMethods": true, "allDeclaredFields": true },
+  { "name": "com.google.genai.types.Content", "allDeclaredConstructors": true, "allDeclaredMethods": true, "allDeclaredFields": true },
+  { "name": "com.google.genai.types.Part", "allDeclaredConstructors": true, "allDeclaredMethods": true, "allDeclaredFields": true }
 ]
